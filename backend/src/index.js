@@ -26,13 +26,32 @@ const PORT = process.env.PORT || 3001;
 // Security middleware
 app.use(helmet());
 
-// Simplified CORS configuration matching working backends
+// Dynamic CORS configuration to support multiple origins
+const getAllowedOrigins = () => {
+  const origins = [];
+  
+  // Add environment-specific frontend URL
+  if (process.env.FRONTEND_URL) {
+    origins.push(process.env.FRONTEND_URL);
+    console.log('🌍 CORS: Added FRONTEND_URL from environment:', process.env.FRONTEND_URL);
+  }
+  
+  // Always include these origins for production and development
+  origins.push(
+    'https://mixfade.com',
+    'https://mixfade-frontend-production.up.railway.app',
+    'http://localhost:5173',
+    'http://localhost:3000'
+  );
+  
+  // Remove duplicates
+  const uniqueOrigins = [...new Set(origins)];
+  console.log('🌍 CORS: Allowed origins configured:', uniqueOrigins);
+  return uniqueOrigins;
+};
+
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || (
-    process.env.NODE_ENV === 'production'
-      ? 'https://mixfade-frontend-production.up.railway.app'
-      : 'http://localhost:5173'
-  ),
+  origin: getAllowedOrigins(),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: [
@@ -41,7 +60,9 @@ const corsOptions = {
     'X-Requested-With',
     'Accept',
     'Origin'
-  ]
+  ],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 app.use(cors(corsOptions));
 
@@ -131,6 +152,27 @@ app.get('/security/stats', (req, res) => {
 
 // Handle preflight requests
 app.options('*', cors(corsOptions));
+
+// Middleware to handle CORS headers explicitly
+app.use((req, res, next) => {
+  // Set CORS headers
+  const origin = req.headers.origin;
+  const allowedOrigins = getAllowedOrigins();
+  
+  if (allowedOrigins.includes(origin)) { 
+    res.header('Access-Control-Allow-Origin', origin); 
+  }
+  res.header('Access-Control-Allow-Methods', corsOptions.methods.join(','));
+  res.header('Access-Control-Allow-Headers', corsOptions.allowedHeaders.join(','));
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+  
+  next();
+});
 
 // API routes
 app.use('/api/email', emailLimiter, emailRoutes);
