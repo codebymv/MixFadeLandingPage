@@ -134,14 +134,15 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Endpoint not found' });
 });
 
-// Start server
-app.listen(PORT, () => {
+// Start server - CRITICAL: Bind to 0.0.0.0 for Railway deployment
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 MixFade Landing Backend running on port ${PORT}`);
   console.log(`🏥 Health check: http://localhost:${PORT}/health`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`📧 Email collection available at /api/email/collect`);
   console.log(`📥 Download tracking available at /api/download/track`);
   console.log(`🔒 Security monitoring active`);
+  console.log(`🌐 Server bound to 0.0.0.0 for Railway compatibility`);
 });
 
 // Graceful shutdown handling
