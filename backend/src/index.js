@@ -5,7 +5,6 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const SecurityMonitor = require('./middleware/security-monitor');
-require('dotenv').config();
 
 const emailRoutes = require('./routes/email');
 const downloadRoutes = require('./routes/download');
