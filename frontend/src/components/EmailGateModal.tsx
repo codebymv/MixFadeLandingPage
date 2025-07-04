@@ -152,11 +152,11 @@ const EmailGateModal = ({
             <div className="mb-4">
               <div className="inline-flex items-center space-x-2 text-emerald-400 text-lg font-medium">
                 <CheckCircle className="w-5 h-5" />
-                <span>Email received!</span>
+                <span>Thank you!</span>
               </div>
             </div>
             <p className="text-slate-300 mb-4">
-              Thank you for downloading MixFade. Your download will begin automatically.
+              Your download will begin automatically.
             </p>
             <div className="flex items-center justify-center space-x-2 text-emerald-400">
               <Download className="w-4 h-4" />
