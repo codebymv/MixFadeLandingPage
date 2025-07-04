@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend API Configuration Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>MixFade Frontend API Configuration Test</h1>
+    
+    <div id="config-info" class="status info">
+        <strong>Current Configuration:</strong>
+        <pre id="config-details">Loading...</pre>
+    </div>
+    
+    <div id="test-results"></div>
+    
+    <button onclick="testBackendConnection()">Test Backend Connection</button>
+    <button onclick="testEmailCollection()">Test Email Collection</button>
+    
+    <script>
+        // Simulate the frontend's API configuration
+        const getApiUrl = () => {
+            // This mimics how Vite handles environment variables
+            const viteApiUrl = undefined; // This would be set if VITE_API_URL was configured
+            return viteApiUrl || 'http://localhost:3001';
+        };
+        
+        const apiUrl = getApiUrl();
+        
+        // Display current configuration
+        document.getElementById('config-details').textContent = `
+API Base URL: ${apiUrl}
+Expected Production URL: https://mixfade-backend-production.up.railway.app
+Status: ${apiUrl.includes('localhost') ? 'DEVELOPMENT (localhost)' : 'PRODUCTION'}
+`;
+        
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = message;
+            document.getElementById('test-results').appendChild(div);
+        }
+        
+        async function testBackendConnection() {
+            addResult('🔍 Testing backend connection...', 'info');
+            
+            try {
+                const response = await fetch(`${apiUrl}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`✅ Backend connection successful!<br><pre>${JSON.stringify(data, null, 2)}</pre>`, 'success');
+                } else {
+                    addResult(`❌ Backend responded with status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Connection failed: ${error.message}<br><strong>This indicates the frontend is trying to connect to the wrong URL!</strong>`, 'error');
+            }
+        }
+        
+        async function testEmailCollection() {
+            addResult('📧 Testing email collection endpoint...', 'info');
+            
+            try {
+                const response = await fetch(`${apiUrl}/api/email/collect`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        platform: 'windows',
+                        version: '1.0.0',
+                        userAgent: navigator.userAgent
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`✅ Email collection endpoint working!<br><pre>${JSON.stringify(data, null, 2)}</pre>`, 'success');
+                } else {
+                    addResult(`❌ Email collection failed with status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Email collection failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Show initial status
+        if (apiUrl.includes('localhost')) {
+            addResult('⚠️ <strong>Issue Detected:</strong> Frontend is configured to use localhost:3001<br>This means the VITE_API_URL environment variable is not set in production.<br><strong>Solution:</strong> Redeploy the frontend service on Railway.', 'warning');
+        } else {
+            addResult('✅ Frontend is correctly configured for production!', 'success');
+        }
+    </script>
+</body>
+</html>

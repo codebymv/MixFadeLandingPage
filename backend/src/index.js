@@ -26,13 +26,36 @@ const PORT = process.env.PORT || 3001;
 // Security middleware
 app.use(helmet());
 
-// CORS configuration
+// CORS configuration with enhanced debugging
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://mixfade.app', 'https://www.mixfade.app', /\.up\.railway\.app$/] // Allow Railway domains
-    : ['http://localhost:8080', 'http://localhost:5173', 'http://localhost:3000'],
+  origin: function (origin, callback) {
+    console.log(`🌐 CORS request from origin: ${origin}`);
+    
+    const allowedOrigins = process.env.NODE_ENV === 'production' 
+      ? ['https://mixfade.app', 'https://www.mixfade.app']
+      : ['http://localhost:8080', 'http://localhost:5173', 'http://localhost:3000'];
+    
+    // Allow Railway domains in production
+    const isRailwayDomain = origin && origin.match(/\.up\.railway\.app$/);
+    
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) {
+      console.log('✅ CORS: Allowing request with no origin');
+      return callback(null, true);
+    }
+    
+    if (allowedOrigins.includes(origin) || isRailwayDomain) {
+      console.log(`✅ CORS: Allowing origin ${origin}`);
+      callback(null, true);
+    } else {
+      console.log(`❌ CORS: Blocking origin ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 };
 app.use(cors(corsOptions));
 
@@ -118,6 +141,22 @@ app.get('/security/stats', (req, res) => {
       error: 'Failed to retrieve security stats'
     });
   }
+});
+
+// Add explicit OPTIONS handler for preflight requests
+app.options('/api/email/collect', (req, res) => {
+  console.log('🔄 OPTIONS request for /api/email/collect');
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.sendStatus(200);
+});
+
+// Request logging middleware
+app.use('/api', (req, res, next) => {
+  console.log(`📝 API Request: ${req.method} ${req.path} from ${req.headers.origin || 'no-origin'}`);
+  next();
 });
 
 // API routes
