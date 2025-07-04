@@ -163,15 +163,21 @@ app.use('/api', (req, res, next) => {
 app.use('/api/email', emailLimiter, emailRoutes);
 app.use('/api/download', downloadRoutes);
 
-// Root endpoint
+// Root endpoint with debugging info
 app.get('/', (req, res) => {
+  console.log(`📝 Root request from ${req.headers.origin || 'no-origin'}`);
   res.json({ 
     message: 'MixFade Landing Backend API',
     version: '1.0.0',
+    environment: process.env.NODE_ENV || 'development',
+    port: PORT,
+    timestamp: new Date().toISOString(),
     endpoints: [
       'GET /health',
+      'GET /api/health',
       'POST /api/email/collect',
-      'POST /api/download/track'
+      'POST /api/download/track',
+      'GET /security/stats'
     ]
   });
 });
@@ -196,6 +202,8 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 MixFade Landing Backend running on port ${PORT}`);
   console.log(`🏥 Health check: http://localhost:${PORT}/health`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🔧 PORT env var: ${process.env.PORT || 'not set'}`);
+  console.log(`🔧 Actual listening port: ${PORT}`);
   console.log(`📧 Email collection available at /api/email/collect`);
   console.log(`📥 Download tracking available at /api/download/track`);
   console.log(`🔒 Security monitoring active`);
