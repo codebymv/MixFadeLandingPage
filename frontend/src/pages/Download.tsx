@@ -221,7 +221,7 @@ const DownloadPage = () => {
           </h1>
           
           <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
-            Get the latest version of MixFade for Windows and start referencing with precision.
+            Get the latest version of MixFade for Windows and start referencing!
           </p>
           
           <div className="glass-panel rounded-2xl p-8 max-w-md mx-auto border border-slate-700/50 neon-glow-fusion">

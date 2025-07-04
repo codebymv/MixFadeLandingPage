@@ -204,7 +204,7 @@ const EmailGateModal = ({
                 </li>
                 <li className="flex items-center space-x-2">
                   <span className="text-emerald-400">•</span>
-                  <span>Tips & audio production guides</span>
+                  <span>Exclusive sample packs and MIDIs</span>
                 </li>
               </ul>
             </div>
