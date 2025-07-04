@@ -41,8 +41,11 @@ class ShopifyService {
       const customerData = {
         customer: {
           email: email.toLowerCase().trim(),
-          accepts_marketing: true,
-          accepts_marketing_updated_at: new Date().toISOString(),
+          email_marketing_consent: {
+            state: 'subscribed',
+            opt_in_level: 'single_opt_in',
+            consent_updated_at: new Date().toISOString()
+          },
           tags: 'mixfade-downloader',
           note: `MixFade download: ${new Date().toISOString()}`,
           ...additionalData
@@ -77,8 +80,11 @@ class ShopifyService {
       const updateData = {
         customer: {
           id: customerId,
-          accepts_marketing: true,
-          accepts_marketing_updated_at: new Date().toISOString(),
+          email_marketing_consent: {
+            state: 'subscribed',
+            opt_in_level: 'single_opt_in',
+            consent_updated_at: new Date().toISOString()
+          },
           tags: 'mixfade-downloader',
           note: `MixFade download: ${new Date().toISOString()}`
         }
@@ -116,7 +122,9 @@ class ShopifyService {
         console.log(`✅ Found existing customer: ${email}`);
         
         // Update customer if they're not already subscribed to marketing
-        if (!existingCustomer.accepts_marketing) {
+        const isSubscribed = existingCustomer.email_marketing_consent && 
+                           existingCustomer.email_marketing_consent.state === 'subscribed';
+        if (!isSubscribed) {
           const updatedCustomer = await this.updateCustomerMarketing(existingCustomer.id, email);
           return {
             customer: updatedCustomer,
