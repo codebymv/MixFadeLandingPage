@@ -10,13 +10,25 @@ const LOGO_IMAGES = [
   "/OS_Full_Logo_transparent.png"
 ];
 
+const FEATURE_IMAGES = [
+  "/ui.png",
+  "/dj.png",
+  "/processing.png",
+  "/fileswap.png"
+];
+
 const Home = () => {
 
-  const { imagesLoaded, loadedImages } = useImagePreloader({
+  const { imagesLoaded: logosLoaded, loadedImages: loadedLogos } = useImagePreloader({
     images: LOGO_IMAGES
   });
 
-  const allImagesReady = imagesLoaded && loadedImages.size === LOGO_IMAGES.length;
+  const { imagesLoaded: featuresLoaded, loadedImages: loadedFeatures } = useImagePreloader({
+    images: FEATURE_IMAGES
+  });
+
+  const allLogosReady = logosLoaded && loadedLogos.size === LOGO_IMAGES.length;
+  const allFeaturesReady = featuresLoaded && loadedFeatures.size === FEATURE_IMAGES.length;
 
   return (
     <div className="min-h-screen bg-slate-900">
@@ -33,16 +45,16 @@ const Home = () => {
             {/* Logo Section with MixFade and OpaqueSound logos */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 mb-6">
                              {/* Logo Container with Loading State */}
-               <div className={`transition-opacity duration-500 ${allImagesReady ? 'opacity-100 hero-fade-in' : 'opacity-0'}`}>
+               <div className={`transition-opacity duration-500 ${allLogosReady ? 'opacity-100 hero-fade-in' : 'opacity-0'}`}>
                  <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6">
                    {/* MixFade Logo */}
                    <div className="relative">
                      {/* Enhanced skeleton placeholder */}
-                     <div className={`w-80 h-20 rounded-lg logo-skeleton ${allImagesReady ? 'hidden' : 'block'}`} />
+                     <div className={`w-80 h-20 rounded-lg logo-skeleton ${allLogosReady ? 'hidden' : 'block'}`} />
                      <img 
                        src="/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.png" 
                        alt="MixFade Logo" 
-                       className={`w-80 sm:w-80 h-auto opacity-90 transition-opacity duration-300 ${allImagesReady ? 'block' : 'hidden'}`}
+                       className={`w-80 sm:w-80 h-auto opacity-90 transition-opacity duration-300 ${allLogosReady ? 'block' : 'hidden'}`}
                      />
                    </div>
                    
@@ -52,11 +64,11 @@ const Home = () => {
                    {/* OpaqueSound Logo */}
                    <div className="relative">
                      {/* Enhanced skeleton placeholder */}
-                     <div className={`w-64 h-16 rounded-lg logo-skeleton ${allImagesReady ? 'hidden' : 'block'}`} />
+                     <div className={`w-64 h-16 rounded-lg logo-skeleton ${allLogosReady ? 'hidden' : 'block'}`} />
                      <img 
                        src="/OS_Full_Logo_transparent.png" 
                        alt="OpaqueSound Logo" 
-                       className={`w-64 sm:w-64 h-auto opacity-90 transition-opacity duration-300 ${allImagesReady ? 'block' : 'hidden'}`}
+                       className={`w-64 sm:w-64 h-auto opacity-90 transition-opacity duration-300 ${allLogosReady ? 'block' : 'hidden'}`}
                      />
                    </div>
                  </div>
@@ -103,14 +115,23 @@ const Home = () => {
           </h2>
           
           {/* Central Feature Card */}
-          <div className="mb-12 flex justify-center">
+          <div className={`mb-12 flex justify-center transition-opacity duration-500 ${allFeaturesReady ? 'opacity-100' : 'opacity-0'}`}>
             <div className="glass-panel rounded-xl p-8 border border-slate-700/50 neon-glow-fusion overflow-hidden max-w-4xl w-full">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-semibold text-white mb-4">Complete Audio Analysis Interface</h3>
+                <p className="text-slate-400 text-lg leading-relaxed max-w-2xl mx-auto">
+                  Experience the full power of MixFade with our comprehensive audio analysis and comparison interface
+                </p>
+              </div>
+              
               {/* Main UI Screenshot */}
-              <div className="rounded-lg overflow-hidden border border-slate-600/30 bg-slate-800/30">
+              <div className="rounded-lg overflow-hidden border border-slate-600/30 bg-slate-800/30 relative">
+                {/* Loading skeleton */}
+                <div className={`w-full h-96 bg-slate-700/30 animate-pulse rounded-lg ${allFeaturesReady ? 'hidden' : 'block'}`} />
                 <img 
                   src="/ui.png" 
                   alt="MixFade Complete Interface" 
-                  className="w-full h-auto transition-transform duration-300 hover:scale-105"
+                  className={`w-full h-auto transition-all duration-300 hover:scale-105 ${allFeaturesReady ? 'block' : 'hidden'}`}
                 />
               </div>
             </div>
@@ -128,11 +149,13 @@ const Home = () => {
               </div>
               
               {/* Screenshot */}
-              <div className="mb-4 rounded-lg overflow-hidden border border-slate-600/30 aspect-[4/3] bg-slate-800/30">
+              <div className="mb-4 rounded-lg overflow-hidden border border-slate-600/30 aspect-[4/3] bg-slate-800/30 relative">
+                {/* Loading skeleton */}
+                <div className={`w-full h-full bg-slate-700/30 animate-pulse rounded-lg ${allFeaturesReady ? 'hidden' : 'block'}`} />
                 <img 
                   src="/dj.png" 
                   alt="DJ-Style Playback Interface" 
-                  className="w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105"
+                  className={`w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105 ${allFeaturesReady ? 'block' : 'hidden'}`}
                 />
               </div>
               
@@ -160,11 +183,13 @@ const Home = () => {
               </div>
               
               {/* Screenshot */}
-              <div className="mb-4 rounded-lg overflow-hidden border border-slate-600/30 aspect-[4/3] bg-slate-800/30">
+              <div className="mb-4 rounded-lg overflow-hidden border border-slate-600/30 aspect-[4/3] bg-slate-800/30 relative">
+                {/* Loading skeleton */}
+                <div className={`w-full h-full bg-slate-700/30 animate-pulse rounded-lg ${allFeaturesReady ? 'hidden' : 'block'}`} />
                 <img 
                   src="/processing.png" 
                   alt="Real-time Processing Interface" 
-                  className="w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105"
+                  className={`w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105 ${allFeaturesReady ? 'block' : 'hidden'}`}
                 />
               </div>
               
@@ -184,11 +209,13 @@ const Home = () => {
               </div>
               
               {/* Screenshot */}
-              <div className="mb-4 rounded-lg overflow-hidden border border-slate-600/30 aspect-[4/3] bg-slate-800/30">
+              <div className="mb-4 rounded-lg overflow-hidden border border-slate-600/30 aspect-[4/3] bg-slate-800/30 relative">
+                {/* Loading skeleton */}
+                <div className={`w-full h-full bg-slate-700/30 animate-pulse rounded-lg ${allFeaturesReady ? 'hidden' : 'block'}`} />
                 <img 
                   src="/fileswap.png" 
                   alt="File Swapping Interface" 
-                  className="w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105"
+                  className={`w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105 ${allFeaturesReady ? 'block' : 'hidden'}`}
                 />
               </div>
               
