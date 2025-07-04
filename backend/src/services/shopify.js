@@ -179,4 +179,4 @@ class ShopifyService {
   }
 }
 
-module.exports = new ShopifyService(); 
+module.exports = ShopifyService;

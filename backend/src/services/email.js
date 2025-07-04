@@ -103,7 +103,4 @@ class EmailService {
   }
 }
 
-// Export singleton instance
-const emailService = new EmailService();
-
-module.exports = { emailService };
+module.exports = EmailService;
