@@ -26,36 +26,22 @@ const PORT = process.env.PORT || 3001;
 // Security middleware
 app.use(helmet());
 
-// CORS configuration with enhanced debugging
+// Simplified CORS configuration matching working backends
 const corsOptions = {
-  origin: function (origin, callback) {
-    console.log(`🌐 CORS request from origin: ${origin}`);
-    
-    const allowedOrigins = process.env.NODE_ENV === 'production' 
-      ? ['https://mixfade.app', 'https://www.mixfade.app']
-      : ['http://localhost:8080', 'http://localhost:5173', 'http://localhost:3000'];
-    
-    // Allow Railway domains in production
-    const isRailwayDomain = origin && origin.match(/\.up\.railway\.app$/);
-    
-    // Allow requests with no origin (mobile apps, Postman, etc.)
-    if (!origin) {
-      console.log('✅ CORS: Allowing request with no origin');
-      return callback(null, true);
-    }
-    
-    if (allowedOrigins.includes(origin) || isRailwayDomain) {
-      console.log(`✅ CORS: Allowing origin ${origin}`);
-      callback(null, true);
-    } else {
-      console.log(`❌ CORS: Blocking origin ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: process.env.FRONTEND_URL || (
+    process.env.NODE_ENV === 'production'
+      ? 'https://mixfade-frontend-production.up.railway.app'
+      : 'http://localhost:5173'
+  ),
   credentials: true,
-  optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin'
+  ]
 };
 app.use(cors(corsOptions));
 
@@ -143,21 +129,8 @@ app.get('/security/stats', (req, res) => {
   }
 });
 
-// Add explicit OPTIONS handler for preflight requests
-app.options('/api/email/collect', (req, res) => {
-  console.log('🔄 OPTIONS request for /api/email/collect');
-  res.header('Access-Control-Allow-Origin', req.headers.origin);
-  res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.sendStatus(200);
-});
-
-// Request logging middleware
-app.use('/api', (req, res, next) => {
-  console.log(`📝 API Request: ${req.method} ${req.path} from ${req.headers.origin || 'no-origin'}`);
-  next();
-});
+// Handle preflight requests
+app.options('*', cors(corsOptions));
 
 // API routes
 app.use('/api/email', emailLimiter, emailRoutes);
@@ -197,25 +170,29 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Endpoint not found' });
 });
 
-// Start server - CRITICAL: Bind to 0.0.0.0 for Railway deployment
+// Start server - KEEP BINDING TO 0.0.0.0 for Railway
 const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 MixFade Landing Backend running on port ${PORT}`);
-  console.log(`🏥 Health check: http://localhost:${PORT}/health`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔧 PORT env var: ${process.env.PORT || 'not set'}`);
-  console.log(`🔧 Actual listening port: ${PORT}`);
-  console.log(`📧 Email collection available at /api/email/collect`);
-  console.log(`📥 Download tracking available at /api/download/track`);
-  console.log(`🔒 Security monitoring active`);
-  console.log(`🌐 Server bound to 0.0.0.0 for Railway compatibility`);
-  console.log(`✅ Server startup completed successfully`);
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`✅ Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`✅ Listening on: 0.0.0.0:${PORT}`);
+  console.log(`✅ Started at: ${new Date().toISOString()}`);
+  console.log('Health check endpoints available at:');
+  console.log('  - /health');
+  console.log('  - /api/health');
+  console.log('\n📋 Available endpoints:');
+  console.log('  - GET  / (API documentation)');
+  console.log('  - GET  /health (Health check)');
+  console.log('  - GET  /api/health (API health check)');
+  console.log('  - POST /api/email/collect (Email collection)');
+  console.log('  - POST /api/email/validate (Email validation)');
+  console.log('  - GET  /api/email/stats (Email statistics)');
+  console.log('  - GET  /security/stats (Security statistics)');
 });
 
-// Handle server startup errors
 server.on('error', (error) => {
   console.error('❌ Server startup error:', error.message);
   if (error.code === 'EADDRINUSE') {
-    console.error(`Port ${PORT} is already in use`);
+    console.error(`❌ Port ${PORT} is already in use`);
   }
   process.exit(1);
 });
