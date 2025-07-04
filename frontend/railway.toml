@@ -1,0 +1,21 @@
+[build]
+command = "npm install && npm run build"
+
+[deploy]
+startCommand = "npx serve -s dist -p $PORT"
+healthcheckPath = "/"
+restartPolicyType = "ON_FAILURE"
+
+# Environment variables
+[deploy.envs]
+NODE_ENV = "production"
+
+# Custom domain configuration
+# After adding this file, you'll need to:
+# 1. Deploy to Railway
+# 2. Add your custom domain in Railway dashboard
+# 3. Configure DNS records at Namecheap
+
+# Build configuration
+[build.watchIgnore]
+patterns = ["node_modules", ".git", "dist", "!docs"]
