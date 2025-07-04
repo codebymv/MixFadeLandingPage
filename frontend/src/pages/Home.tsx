@@ -102,6 +102,20 @@ const Home = () => {
             The Ultimate Reference Tool
           </h2>
           
+          {/* Central Feature Card */}
+          <div className="mb-12 flex justify-center">
+            <div className="glass-panel rounded-xl p-8 border border-slate-700/50 neon-glow-fusion overflow-hidden max-w-4xl w-full">
+              {/* Main UI Screenshot */}
+              <div className="rounded-lg overflow-hidden border border-slate-600/30 bg-slate-800/30">
+                <img 
+                  src="/ui.png" 
+                  alt="MixFade Complete Interface" 
+                  className="w-full h-auto transition-transform duration-300 hover:scale-105"
+                />
+              </div>
+            </div>
+          </div>
+          
           <div className="grid md:grid-cols-3 gap-8">
             <div className="glass-panel rounded-xl p-6 border border-slate-700/50 neon-glow-green overflow-hidden">
               <div className="flex items-center mb-4">
