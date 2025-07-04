@@ -29,7 +29,7 @@ app.use(helmet());
 // CORS configuration
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://mixfade.app', 'https://www.mixfade.app'] // Replace with your actual domain
+    ? ['https://mixfade.app', 'https://www.mixfade.app', /\.up\.railway\.app$/] // Allow Railway domains
     : ['http://localhost:8080', 'http://localhost:5173', 'http://localhost:3000'],
   credentials: true,
   optionsSuccessStatus: 200
@@ -84,12 +84,21 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 // Logging
 app.use(morgan('combined'));
 
-// Health check endpoint
+// Health check endpoints
 app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
     service: 'MixFade Landing Backend'
+  });
+});
+
+// API health check endpoint (for frontend compatibility)
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    service: 'MixFade Landing Backend API'
   });
 });
 

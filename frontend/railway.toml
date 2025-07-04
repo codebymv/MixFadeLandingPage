@@ -9,6 +9,7 @@ restartPolicyType = "ON_FAILURE"
 # Environment variables
 [deploy.envs]
 NODE_ENV = "production"
+VITE_API_URL = "https://mixfade-backend-production.up.railway.app"
 
 # Custom domain configuration
 # After adding this file, you'll need to:
