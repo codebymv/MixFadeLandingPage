@@ -49,15 +49,11 @@ const Home = () => {
               {/* Logo Container - Direct approach */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6">
                 {/* MixFade Logo */}
-                <div className="relative w-80 h-20">
-                  {/* Skeleton - only show when image not loaded */}
-                  {!logoLoaded.has(LOGO_IMAGES[0]) && (
-                    <div className="absolute inset-0 w-80 h-20 rounded-lg logo-skeleton" />
-                  )}
+                <div className="w-80 h-20 flex items-center justify-center">
                   <img 
                     src="/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.png" 
                     alt="MixFade Logo" 
-                    className={`w-80 sm:w-80 h-auto opacity-90 transition-opacity duration-500 ${logoLoaded.has(LOGO_IMAGES[0]) ? 'opacity-90' : 'opacity-0'}`}
+                    className={`w-80 sm:w-80 h-auto transition-opacity duration-300 ${logoLoaded.has(LOGO_IMAGES[0]) ? 'opacity-90' : 'opacity-0'}`}
                     loading="eager"
                     decoding="sync"
                     onLoad={() => handleLogoLoad(LOGO_IMAGES[0])}
@@ -73,15 +69,11 @@ const Home = () => {
                 <span className="text-slate-400 text-lg sm:text-xl font-medium">by</span>
                 
                 {/* OpaqueSound Logo */}
-                <div className="relative w-64 h-16">
-                  {/* Skeleton - only show when image not loaded */}
-                  {!logoLoaded.has(LOGO_IMAGES[1]) && (
-                    <div className="absolute inset-0 w-64 h-16 rounded-lg logo-skeleton" />
-                  )}
+                <div className="w-64 h-16 flex items-center justify-center">
                   <img 
                     src="/OS_Full_Logo_transparent.png" 
                     alt="OpaqueSound Logo" 
-                    className={`w-64 sm:w-64 h-auto opacity-90 transition-opacity duration-500 ${logoLoaded.has(LOGO_IMAGES[1]) ? 'opacity-90' : 'opacity-0'}`}
+                    className={`w-64 sm:w-64 h-auto transition-opacity duration-300 ${logoLoaded.has(LOGO_IMAGES[1]) ? 'opacity-90' : 'opacity-0'}`}
                     loading="eager"
                     decoding="sync"
                     onLoad={() => handleLogoLoad(LOGO_IMAGES[1])}
