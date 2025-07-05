@@ -3,23 +3,26 @@ const fs = require('fs');
 const path = require('path');
 const router = express.Router();
 
-// Function to find the docs directory
+// Function to find the docs directory with comprehensive fallback strategy
 function findDocsPath() {
   console.log('Starting docs folder search...');
   console.log('Current working directory:', process.cwd());
   console.log('__dirname:', __dirname);
   
-  // Possible locations for the docs folder (based on working projects)
+  // Comprehensive list of possible locations for the docs folder
   const possiblePaths = [
     path.join(__dirname, '../../docs'),          // Copied docs folder in backend/docs
     path.join(__dirname, '../../../!docs'),      // Development: backend/src/routes -> project root
     path.join(__dirname, '../../!docs'),         // Production scenario 1: backend -> project root
     path.join(__dirname, '../!docs'),            // Production scenario 2: src -> project root
     path.join(__dirname, '../../../../!docs'),   // Production scenario 3: deeper nesting
-    path.join(process.cwd(), '!docs'),          // Using process working directory
+    path.join(process.cwd(), 'docs'),           // Railway: copied docs in working directory
+    path.join(process.cwd(), '!docs'),          // Railway: original docs in working directory
     path.join(process.cwd(), '../!docs'),       // One level up from working directory
-    path.join(process.cwd(), 'docs'),           // Copied docs in working directory
     path.join(process.cwd(), 'backend/docs'),   // Copied docs in backend subfolder
+    '/app/docs',                                // Railway absolute path (common location)
+    '/app/!docs',                               // Railway absolute path (original folder)
+    '/app/backend/docs',                        // Railway nested backend docs
   ];
 
   console.log('Checking paths:', possiblePaths);
@@ -62,11 +65,6 @@ router.get('/content', async (req, res) => {
       return res.status(400).json({ error: 'Path parameter is required' });
     }
 
-    // Security check: prevent directory traversal
-    if (docPath.includes('..') || docPath.includes('\\') || docPath.startsWith('/')) {
-      return res.status(400).json({ error: 'Invalid path' });
-    }
-
     const docsDir = findDocsPath();
     if (!docsDir) {
       return res.status(404).json({ 
@@ -75,24 +73,52 @@ router.get('/content', async (req, res) => {
       });
     }
 
-    const filePath = path.join(docsDir, `${docPath}.md`);
+    // Construct the full file path
+    const fileName = docPath.endsWith('.md') ? docPath : `${docPath}.md`;
+    const fullPath = path.join(docsDir, fileName);
+
+    // Security check: ensure the path is within the docs directory
+    const resolvedPath = path.resolve(fullPath);
+    const resolvedDocsPath = path.resolve(docsDir);
     
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ 
-        error: 'Document not found',
-        content: getFallbackDocContent(docPath)
+    if (!resolvedPath.startsWith(resolvedDocsPath)) {
+      return res.status(403).json({
+        error: 'Access denied: Path outside docs directory'
       });
     }
 
-    const content = fs.readFileSync(filePath, 'utf8');
-    const stats = fs.statSync(filePath);
+    try {
+      const content = fs.readFileSync(resolvedPath, 'utf8');
+      const stats = fs.statSync(resolvedPath);
     
-    res.json({
-      content,
-      path: docPath,
-      lastModified: stats.mtime,
-      size: stats.size
-    });
+      res.json({
+        content,
+        path: docPath,
+        lastModified: stats.mtime.toISOString(),
+        size: stats.size
+      });
+    } catch (fileError) {
+      if (fileError.code === 'ENOENT') {
+        // File not found, try fallback content
+        const fallbackContent = getFallbackDocContent(docPath);
+        if (fallbackContent) {
+          res.json({
+            content: fallbackContent,
+            path: docPath,
+            lastModified: new Date().toISOString(),
+            size: fallbackContent.length,
+            source: 'fallback'
+          });
+        } else {
+          res.status(404).json({
+            error: 'Document not found',
+            path: docPath
+          });
+        }
+      } else {
+        throw fileError;
+      }
+    }
   } catch (error) {
     console.error('Error reading document:', error);
     res.status(500).json({ 
@@ -110,7 +136,7 @@ router.get('/structure', async (req, res) => {
       return res.json(getDefaultDocStructure());
     }
 
-    const structure = buildDocStructure(docsDir);
+    const structure = await buildDocStructure(docsDir);
     res.json(structure);
   } catch (error) {
     console.error('Error building doc structure:', error);
@@ -135,7 +161,7 @@ router.get('/search', async (req, res) => {
       return res.json([]);
     }
 
-    const results = searchDocuments(docsDir, query.toLowerCase());
+    const results = await searchDocuments(docsDir, query.toLowerCase());
     res.json(results);
   } catch (error) {
     console.error('Error searching documents:', error);
@@ -144,15 +170,16 @@ router.get('/search', async (req, res) => {
 });
 
 // Helper function to build documentation structure
-function buildDocStructure(docsDir, relativePath = '') {
+async function buildDocStructure(docsDir, relativePath = '') {
   const items = [];
   const fullPath = path.join(docsDir, relativePath);
   
-  if (!fs.existsSync(fullPath)) {
-    return items;
-  }
+  try {
+    if (!fs.existsSync(fullPath)) {
+      return items;
+    }
 
-  const entries = fs.readdirSync(fullPath, { withFileTypes: true });
+    const entries = fs.readdirSync(fullPath, { withFileTypes: true });
   
   // Sort: directories first, then files, both alphabetically
   entries.sort((a, b) => {
@@ -167,7 +194,7 @@ function buildDocStructure(docsDir, relativePath = '') {
     const itemPath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
     
     if (entry.isDirectory()) {
-      const children = buildDocStructure(docsDir, itemPath);
+      const children = await buildDocStructure(docsDir, itemPath);
       items.push({
         name: formatName(entry.name),
         path: itemPath,
@@ -185,17 +212,22 @@ function buildDocStructure(docsDir, relativePath = '') {
   }
 
   return items;
+  } catch (error) {
+    console.error(`Error reading directory ${fullPath}:`, error);
+    return items;
+  }
 }
 
 // Helper function to search documents
-function searchDocuments(docsDir, query, relativePath = '', results = []) {
+async function searchDocuments(docsDir, query, relativePath = '', results = []) {
   const fullPath = path.join(docsDir, relativePath);
   
-  if (!fs.existsSync(fullPath)) {
-    return results;
-  }
+  try {
+    if (!fs.existsSync(fullPath)) {
+      return results;
+    }
 
-  const entries = fs.readdirSync(fullPath, { withFileTypes: true });
+    const entries = fs.readdirSync(fullPath, { withFileTypes: true });
   
   for (const entry of entries) {
     if (entry.name.startsWith('.')) continue;
@@ -203,7 +235,7 @@ function searchDocuments(docsDir, query, relativePath = '', results = []) {
     const itemPath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
     
     if (entry.isDirectory()) {
-      searchDocuments(docsDir, query, itemPath, results);
+      await searchDocuments(docsDir, query, itemPath, results);
     } else if (entry.name.endsWith('.md')) {
       const nameWithoutExt = entry.name.replace('.md', '');
       const docPath = itemPath.replace('.md', '');
@@ -237,6 +269,10 @@ function searchDocuments(docsDir, query, relativePath = '', results = []) {
   }
 
   return results;
+  } catch (error) {
+    console.error(`Error searching directory ${fullPath}:`, error);
+    return results;
+  }
 }
 
 // Helper function to extract excerpt around search query

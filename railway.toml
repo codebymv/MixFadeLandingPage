@@ -1,0 +1,27 @@
+[build]
+command = "npm install && npm run railway:build"
+
+[deploy]
+startCommand = "npm run start:backend"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+# Deploy from project root to include !docs folder
+[[services]]
+name = "backend"
+source = "."
+startCommand = "npm run start:backend"
+
+# Environment variables
+[deploy.envs]
+NODE_ENV = "production"
+
+# Make sure Railway includes all necessary files and doesn't ignore docs
+[build.watchIgnore]
+# Only ignore actual unnecessary files
+"node_modules"
+".git"
+"frontend/node_modules"
+"backend/node_modules"

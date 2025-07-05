@@ -24,6 +24,10 @@ const securityMonitor = new SecurityMonitor();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust proxy for Railway deployment (fixes X-Forwarded-For header validation)
+// Railway uses a reverse proxy, so we need to trust the first proxy
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet());
 
