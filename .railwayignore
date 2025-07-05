@@ -1,0 +1,10 @@
+# Only ignore actual unnecessary files for Railway deployment
+node_modules
+.git
+*.log
+.DS_Store
+Thumbs.db
+
+# Keep !docs directory for documentation sync
+# Keep sync-docs.js for build process
+# Keep all package.json files for proper dependency management
