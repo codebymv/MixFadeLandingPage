@@ -5,11 +5,12 @@ const router = express.Router();
 
 // Function to find the docs folder in different deployment scenarios
 const findDocsPath = () => {
-  // Try multiple possible locations for the docs folder
+  // Try multiple possible locations for the docs folder - matching Itemize.cloud working pattern
   const possiblePaths = [
+    path.join(__dirname, '../../../!docs'),  // Original path for other projects
     path.join(__dirname, '../../docs'),      // Current project structure (backend/docs)
-    path.join(__dirname, '../../../!docs'),  // Original path for source docs
-    path.join(__dirname, '../../../docs')    // Alternative structure
+    path.join(__dirname, '../../../docs'),   // Alternative structure
+    path.join(__dirname, '../../../../docs') // Railway deployment structure (matches /app/docs)
   ];
 
   for (const docsPath of possiblePaths) {
