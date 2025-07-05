@@ -16,12 +16,40 @@ async function copyDocs() {
   console.log(`📁 Target: ${DOCS_TARGET}`);
   console.log(`📁 Current working directory: ${process.cwd()}`);
   console.log(`📁 __dirname: ${__dirname}`);
+  console.log(`📁 NODE_ENV: ${process.env.NODE_ENV}`);
+  console.log(`📁 RAILWAY_ENVIRONMENT: ${process.env.RAILWAY_ENVIRONMENT}`);
+  
+  // List all files in current directory for debugging
+  try {
+    const currentDirContents = await fs.readdir('.');
+    console.log(`📋 Current directory contents: ${currentDirContents.join(', ')}`);
+  } catch (err) {
+    console.log(`❌ Could not read current directory: ${err.message}`);
+  }
 
   try {
     // Check if source exists
     console.log(`🔍 Checking if source exists: ${DOCS_SOURCE}`);
-    await fs.access(DOCS_SOURCE);
-    console.log('✅ Source directory found');
+    
+    // Try to get detailed info about the source
+    try {
+      const sourceStat = await fs.stat(DOCS_SOURCE);
+      console.log(`✅ Source directory found - isDirectory: ${sourceStat.isDirectory()}`);
+    } catch (statError) {
+      console.log(`❌ Source stat failed: ${statError.message}`);
+      
+      // Try to list what's actually in the current directory
+      console.log('🔍 Attempting to find !docs or similar directories...');
+      const allItems = await fs.readdir('.', { withFileTypes: true });
+      const directories = allItems.filter(item => item.isDirectory()).map(item => item.name);
+      console.log(`📁 Available directories: ${directories.join(', ')}`);
+      
+      // Look for any docs-related directories
+      const docsLike = directories.filter(dir => dir.toLowerCase().includes('docs'));
+      console.log(`📚 Docs-like directories: ${docsLike.join(', ')}`);
+      
+      throw statError;
+    }
     
     // List source contents for debugging
     const sourceContents = await fs.readdir(DOCS_SOURCE);
