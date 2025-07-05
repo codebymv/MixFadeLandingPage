@@ -22,11 +22,15 @@
     "railway:start": "npm run start:backend",
     "lint": "cd frontend && npm run lint",
     "test": "cd frontend && npm run test",
+    "docs:sync": "node sync-docs.js sync",
+    "docs:watch": "node sync-docs.js watch",
+    "docs:check": "node sync-docs.js check",
     "clean": "rm -rf node_modules frontend/node_modules backend/node_modules frontend/dist",
     "clean:install": "npm run clean && npm run install:all"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "chokidar": "^3.5.3"
   },
   "dependencies": {}
-} 
+}
