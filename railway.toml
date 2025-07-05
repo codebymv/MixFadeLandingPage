@@ -1,8 +1,8 @@
 [build]
-command = "npm install && npm run build"
+command = "npm install && npm run railway:build"
 
 [deploy]
-startCommand = "npm start"
+startCommand = "npm run railway:start"
 
 # Deploy from project root to include !docs folder
 [[services]]
