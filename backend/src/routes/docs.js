@@ -5,7 +5,8 @@ const router = express.Router();
 
 function findDocsPath() {
   // Use backend/docs since documentation is synced there before deployment
-  const docsPath = path.join(__dirname, '../../docs');
+  // __dirname is /app/backend/src/routes, so we need ../../../backend/docs to get to /app/backend/docs
+  const docsPath = path.join(__dirname, '../../../backend/docs');
   console.log(`📚 Using docs path: ${docsPath}`);
   return docsPath;
 }
