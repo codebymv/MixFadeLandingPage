@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 interface UseImagePreloaderOptions {
   images: string[];
@@ -11,9 +11,6 @@ interface UseImagePreloaderReturn {
   imagesLoaded: boolean;
   loadedImages: Set<string>;
   progress: number;
-  getImageSrc: (originalSrc: string) => string;
-  handleImageLoad: (src: string) => void;
-  handleImageError: (src: string) => void;
 }
 
 export const useImagePreloader = ({
@@ -21,54 +18,78 @@ export const useImagePreloader = ({
   onLoad,
   onError
 }: UseImagePreloaderOptions): UseImagePreloaderReturn => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
-  const [errorImages, setErrorImages] = useState<Set<string>>(new Set());
 
-  const handleImageLoad = useCallback((src: string) => {
-    setLoadedImages(prev => {
-      const newSet = new Set(prev);
-      newSet.add(src);
-      
-      // Check if all images are loaded
-      if (newSet.size === images.length) {
+  useEffect(() => {
+    if (images.length === 0) {
+      setIsLoading(false);
+      setImagesLoaded(true);
+      return;
+    }
+
+    setIsLoading(true);
+    setImagesLoaded(false);
+    setLoadedImages(new Set());
+
+    const preloadImages = images.map(src => {
+      return new Promise<string>((resolve, reject) => {
+        const img = new Image();
+        
+        img.onload = () => {
+          setLoadedImages(prev => new Set([...prev, src]));
+          resolve(src);
+        };
+        
+        img.onerror = () => {
+          const error = new Error(`Failed to load image: ${src}`);
+          reject(error);
+        };
+        
+        img.src = src;
+      });
+    });
+
+    Promise.allSettled(preloadImages)
+      .then((results) => {
+        const successful = results.filter(result => result.status === 'fulfilled').length;
+        const failed = results.filter(result => result.status === 'rejected');
+        
+        if (failed.length > 0) {
+          const errors = failed.map(result => 
+            result.status === 'rejected' ? result.reason : new Error('Unknown error')
+          );
+          console.warn('Some images failed to preload:', errors);
+          onError?.(new Error(`${failed.length} images failed to load`));
+        }
+        
+        // Add a delay to prevent mobile flash/reload issues
+        // This ensures smooth transition between loading and loaded states
+        // Longer delay on mobile devices for better stability
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const delay = isMobile ? 200 : 100;
+        
         setTimeout(() => {
+          setImagesLoaded(successful > 0 || images.length === 0);
+          setIsLoading(false);
           onLoad?.();
-        }, 50); // Small delay to ensure smooth transition
-      }
-      
-      return newSet;
-    });
-  }, [images.length, onLoad]);
+        }, delay);
+      })
+      .catch(error => {
+        console.error('Critical error during image preloading:', error);
+        setImagesLoaded(true); // Fail gracefully
+        setIsLoading(false);
+        onError?.(error);
+      });
+  }, [images]); // Removed onLoad and onError from dependencies to prevent infinite loop
 
-  const handleImageError = useCallback((src: string) => {
-    setErrorImages(prev => {
-      const newSet = new Set(prev);
-      newSet.add(src);
-      
-      console.error(`Failed to load image: ${src}`);
-      onError?.(new Error(`Failed to load image: ${src}`));
-      
-      return newSet;
-    });
-  }, [onError]);
-
-  const getImageSrc = useCallback((originalSrc: string): string => {
-    return originalSrc;
-  }, []);
-
-  const totalImages = images.length;
-  const totalLoaded = loadedImages.size + errorImages.size;
-  const isLoading = totalLoaded < totalImages;
-  const imagesLoaded = !isLoading && loadedImages.size > 0;
-  const progress = totalImages > 0 ? (totalLoaded / totalImages) * 100 : 100;
+  const progress = images.length > 0 ? (loadedImages.size / images.length) * 100 : 100;
 
   return {
     isLoading,
     imagesLoaded,
     loadedImages,
-    progress,
-    getImageSrc,
-    handleImageLoad,
-    handleImageError
+    progress
   };
 };

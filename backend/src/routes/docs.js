@@ -1,0 +1,318 @@
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const router = express.Router();
+
+// Function to find the docs directory
+function findDocsPath() {
+  const possiblePaths = [
+    path.join(__dirname, '../../../!docs'),
+    path.join(__dirname, '../../!docs'),
+    path.join(__dirname, '../!docs'),
+    path.join(process.cwd(), '!docs'),
+    path.join(process.cwd(), 'docs'),
+    path.join(__dirname, '../../../docs')
+  ];
+
+  for (const docsPath of possiblePaths) {
+    console.log(`🔍 Checking docs path: ${docsPath}`);
+    if (fs.existsSync(docsPath)) {
+      console.log(`✅ Found docs directory at: ${docsPath}`);
+      return docsPath;
+    }
+  }
+
+  console.warn('⚠️ Docs directory not found, using fallback');
+  return null;
+}
+
+// Get document content
+router.get('/content', async (req, res) => {
+  try {
+    const { path: docPath } = req.query;
+    
+    if (!docPath) {
+      return res.status(400).json({ error: 'Path parameter is required' });
+    }
+
+    // Security check: prevent directory traversal
+    if (docPath.includes('..') || docPath.includes('\\') || docPath.startsWith('/')) {
+      return res.status(400).json({ error: 'Invalid path' });
+    }
+
+    const docsDir = findDocsPath();
+    if (!docsDir) {
+      return res.status(404).json({ 
+        error: 'Documentation directory not found',
+        content: getFallbackDocContent(docPath)
+      });
+    }
+
+    const filePath = path.join(docsDir, `${docPath}.md`);
+    
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ 
+        error: 'Document not found',
+        content: getFallbackDocContent(docPath)
+      });
+    }
+
+    const content = fs.readFileSync(filePath, 'utf8');
+    const stats = fs.statSync(filePath);
+    
+    res.json({
+      content,
+      path: docPath,
+      lastModified: stats.mtime,
+      size: stats.size
+    });
+  } catch (error) {
+    console.error('Error reading document:', error);
+    res.status(500).json({ 
+      error: 'Failed to read document',
+      content: getFallbackDocContent(req.query.path || 'unknown')
+    });
+  }
+});
+
+// Get documentation structure
+router.get('/structure', async (req, res) => {
+  try {
+    const docsDir = findDocsPath();
+    if (!docsDir) {
+      return res.json(getDefaultDocStructure());
+    }
+
+    const structure = buildDocStructure(docsDir);
+    res.json(structure);
+  } catch (error) {
+    console.error('Error building doc structure:', error);
+    res.status(500).json({ 
+      error: 'Failed to build documentation structure',
+      structure: getDefaultDocStructure()
+    });
+  }
+});
+
+// Search documents
+router.get('/search', async (req, res) => {
+  try {
+    const { q: query } = req.query;
+    
+    if (!query || query.trim().length === 0) {
+      return res.json([]);
+    }
+
+    const docsDir = findDocsPath();
+    if (!docsDir) {
+      return res.json([]);
+    }
+
+    const results = searchDocuments(docsDir, query.toLowerCase());
+    res.json(results);
+  } catch (error) {
+    console.error('Error searching documents:', error);
+    res.status(500).json({ error: 'Search failed' });
+  }
+});
+
+// Helper function to build documentation structure
+function buildDocStructure(docsDir, relativePath = '') {
+  const items = [];
+  const fullPath = path.join(docsDir, relativePath);
+  
+  if (!fs.existsSync(fullPath)) {
+    return items;
+  }
+
+  const entries = fs.readdirSync(fullPath, { withFileTypes: true });
+  
+  // Sort: directories first, then files, both alphabetically
+  entries.sort((a, b) => {
+    if (a.isDirectory() && !b.isDirectory()) return -1;
+    if (!a.isDirectory() && b.isDirectory()) return 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  for (const entry of entries) {
+    if (entry.name.startsWith('.')) continue;
+    
+    const itemPath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+    
+    if (entry.isDirectory()) {
+      const children = buildDocStructure(docsDir, itemPath);
+      items.push({
+        name: formatName(entry.name),
+        path: itemPath,
+        type: 'folder',
+        children
+      });
+    } else if (entry.name.endsWith('.md')) {
+      const nameWithoutExt = entry.name.replace('.md', '');
+      items.push({
+        name: formatName(nameWithoutExt),
+        path: itemPath.replace('.md', ''),
+        type: 'file'
+      });
+    }
+  }
+
+  return items;
+}
+
+// Helper function to search documents
+function searchDocuments(docsDir, query, relativePath = '', results = []) {
+  const fullPath = path.join(docsDir, relativePath);
+  
+  if (!fs.existsSync(fullPath)) {
+    return results;
+  }
+
+  const entries = fs.readdirSync(fullPath, { withFileTypes: true });
+  
+  for (const entry of entries) {
+    if (entry.name.startsWith('.')) continue;
+    
+    const itemPath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+    
+    if (entry.isDirectory()) {
+      searchDocuments(docsDir, query, itemPath, results);
+    } else if (entry.name.endsWith('.md')) {
+      const nameWithoutExt = entry.name.replace('.md', '');
+      const docPath = itemPath.replace('.md', '');
+      
+      // Check if filename matches
+      if (nameWithoutExt.toLowerCase().includes(query)) {
+        results.push({
+          name: formatName(nameWithoutExt),
+          path: docPath,
+          type: 'file',
+          excerpt: `Document: ${formatName(nameWithoutExt)}`
+        });
+        continue;
+      }
+      
+      // Check if content matches
+      try {
+        const content = fs.readFileSync(path.join(docsDir, itemPath), 'utf8');
+        if (content.toLowerCase().includes(query)) {
+          results.push({
+            name: formatName(nameWithoutExt),
+            path: docPath,
+            type: 'file',
+            excerpt: extractExcerpt(content, query)
+          });
+        }
+      } catch (error) {
+        console.error(`Error reading file ${itemPath}:`, error);
+      }
+    }
+  }
+
+  return results;
+}
+
+// Helper function to extract excerpt around search query
+function extractExcerpt(content, query) {
+  const index = content.toLowerCase().indexOf(query.toLowerCase());
+  if (index === -1) return '';
+  
+  const start = Math.max(0, index - 50);
+  const end = Math.min(content.length, index + query.length + 50);
+  let excerpt = content.substring(start, end);
+  
+  if (start > 0) excerpt = '...' + excerpt;
+  if (end < content.length) excerpt = excerpt + '...';
+  
+  return excerpt;
+}
+
+// Helper function to format names
+function formatName(name) {
+  return name
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, l => l.toUpperCase());
+}
+
+// Fallback content for missing documents
+function getFallbackDocContent(docPath) {
+  if (docPath === 'getting-started') {
+    return `# Getting Started with MixFade
+
+Welcome to MixFade, the ultimate audio mixing and DJ application!
+
+## Quick Start
+
+1. **Download**: Get the latest version from our website
+2. **Install**: Run the installer and follow the setup wizard
+3. **Launch**: Open MixFade and start mixing!
+
+## Key Features
+
+- **Professional Audio Tools**: Advanced mixing capabilities
+- **Real-time Visualization**: Waveforms, spectrograms, and more
+- **Cross-platform**: Available on Windows, macOS, and Linux
+- **Intuitive Interface**: Easy to learn, powerful to master
+
+## Getting Help
+
+- Check out our documentation sections
+- Submit bug reports through our feedback system
+- Join our community for tips and tricks
+
+Happy mixing! 🎵`;
+  }
+  
+  return `# ${formatName(docPath)}
+
+This documentation section is coming soon.
+
+In the meantime, you can:
+- Explore other sections in the sidebar
+- Submit feedback through the bug report form
+- Check back later for updates
+
+Thank you for your patience as we continue to improve the documentation!`;
+}
+
+// Default documentation structure
+function getDefaultDocStructure() {
+  return [
+    {
+      name: 'Getting Started',
+      path: 'getting-started',
+      type: 'file'
+    },
+    {
+      name: 'Getting Started Github',
+      path: 'getting-started-github',
+      type: 'file'
+    },
+    {
+      name: 'Stack',
+      path: 'Stack',
+      type: 'folder',
+      children: [
+        {
+          name: 'Stack Overview',
+          path: 'Stack/stack-overview',
+          type: 'file'
+        }
+      ]
+    },
+    {
+      name: 'Types',
+      path: 'Types',
+      type: 'folder',
+      children: [
+        {
+          name: 'Component Interfaces',
+          path: 'Types/component-interfaces',
+          type: 'file'
+        }
+      ]
+    }
+  ];
+}
+
+module.exports = router;

@@ -201,15 +201,17 @@ export const docStructure: DocStructure[] = [
 
 export const fetchDocContent = async (path: string): Promise<string> => {
   try {
-    // Convert path to markdown file path
-    const filePath = `/docs/${path}.md`;
-    const response = await fetch(filePath);
+    // Use backend API to fetch document content
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    const response = await fetch(`${apiUrl}/api/docs/content?path=${encodeURIComponent(path)}`);
     
     if (!response.ok) {
-      return `# Document Not Found\n\nThe requested document at path "${path}" could not be found.`;
+      const errorData = await response.json().catch(() => ({}));
+      return errorData.content || `# Document Not Found\n\nThe requested document at path "${path}" could not be found.`;
     }
     
-    return await response.text();
+    const data = await response.json();
+    return data.content;
   } catch (error) {
     console.error('Error loading document:', error);
     return `# Error Loading Document\n\nThere was an error loading the document at path "${path}".`;
@@ -223,7 +225,45 @@ class DocsService {
   }
 
   async getDocStructure(): Promise<DocStructure[]> {
-    return docStructure;
+    try {
+      // Use backend API to fetch document structure
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${apiUrl}/api/docs/structure`);
+      
+      if (!response.ok) {
+        console.warn('Failed to fetch doc structure from backend, using fallback');
+        return docStructure;
+      }
+      
+      const data = await response.json();
+      return Array.isArray(data) ? data : docStructure;
+    } catch (error) {
+      console.error('Error fetching doc structure:', error);
+      return docStructure;
+    }
+  }
+
+  async searchDocuments(query: string): Promise<DocStructure[]> {
+    try {
+      if (!query.trim()) {
+        return [];
+      }
+      
+      // Use backend API to search documents
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${apiUrl}/api/docs/search?q=${encodeURIComponent(query)}`);
+      
+      if (!response.ok) {
+        console.warn('Failed to search documents from backend');
+        return [];
+      }
+      
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
+    } catch (error) {
+      console.error('Error searching documents:', error);
+      return [];
+    }
   }
 
   generateFolderContent(path: string): string {
@@ -385,4 +425,4 @@ For more detailed development information, see the other documentation sections.
   }
 }
 
-export const docsService = new DocsService(); 
+export const docsService = new DocsService();

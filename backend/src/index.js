@@ -7,10 +7,11 @@ const rateLimit = require('express-rate-limit');
 const SecurityMonitor = require('./middleware/security-monitor');
 
 // Import routes with error handling
-let emailRoutes, downloadRoutes;
+let emailRoutes, downloadRoutes, docsRoutes;
 try {
   emailRoutes = require('./routes/email');
   downloadRoutes = require('./routes/download');
+  docsRoutes = require('./routes/docs');
   console.log('✅ Routes loaded successfully');
 } catch (error) {
   console.error('❌ Error loading routes:', error.message);
@@ -41,7 +42,8 @@ const getAllowedOrigins = () => {
     'https://mixfade.com',
     'https://mixfade-frontend-production.up.railway.app',
     'http://localhost:5173',
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'http://localhost:8080'
   );
   
   // Remove duplicates
@@ -177,6 +179,7 @@ app.use((req, res, next) => {
 // API routes
 app.use('/api/email', emailLimiter, emailRoutes);
 app.use('/api/download', downloadRoutes);
+app.use('/api/docs', docsRoutes);
 
 // Root endpoint with debugging info
 app.get('/', (req, res) => {
@@ -192,6 +195,9 @@ app.get('/', (req, res) => {
       'GET /api/health',
       'POST /api/email/collect',
       'POST /api/download/track',
+      'GET /api/docs/content',
+      'GET /api/docs/structure',
+      'GET /api/docs/search',
       'GET /security/stats'
     ]
   });
@@ -228,6 +234,9 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   console.log('  - POST /api/email/collect (Email collection)');
   console.log('  - POST /api/email/validate (Email validation)');
   console.log('  - GET  /api/email/stats (Email statistics)');
+  console.log('  - GET  /api/docs/content (Documentation content)');
+  console.log('  - GET  /api/docs/structure (Documentation structure)');
+  console.log('  - GET  /api/docs/search (Documentation search)');
   console.log('  - GET  /security/stats (Security statistics)');
 });
 

@@ -397,48 +397,16 @@ All colors MUST be HSL.
     }
   }
   
-  /* Prevent image flashing on mobile */
-  img {
-    image-rendering: auto;
-    image-rendering: optimizeQuality;
-    backface-visibility: hidden;
-    transform: translateZ(0);
-    will-change: opacity;
-    /* Prevent image flickering during transitions */
-    -webkit-backface-visibility: hidden;
-    -moz-backface-visibility: hidden;
-    -ms-backface-visibility: hidden;
-    /* Force hardware acceleration */
+  /* Optimize logo images for mobile rendering */
+  img[alt*="Logo"] {
     -webkit-transform: translateZ(0);
-    -moz-transform: translateZ(0);
-    -ms-transform: translateZ(0);
-    -o-transform: translateZ(0);
-  }
-  
-  /* Enhanced skeleton loading for mobile */
-  .logo-skeleton {
-    animation-duration: 1.5s;
-    animation-timing-function: ease-in-out;
-  }
-  
-  /* Mobile-specific logo loading */
-  .relative img {
-    /* Ensure smooth opacity transitions */
-    transition: opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    /* Prevent layout shift during loading */
-    display: block;
-    width: 100%;
-    height: auto;
-    /* Anti-aliasing for better image quality */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  
-  /* Fixed container sizes to prevent layout shift */
-  .relative {
-    /* Ensure consistent container sizing */
-    overflow: hidden;
-    /* Prevent content jumping */
-    contain: layout style;
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000px;
+    perspective: 1000px;
+    will-change: opacity;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
   }
 }
