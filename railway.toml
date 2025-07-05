@@ -1,18 +1,14 @@
 [build]
-command = "npm install && npm run railway:build"
+command = "npm install && npm run build"
 
 [deploy]
-startCommand = "npm run start:backend"
-healthcheckPath = "/api/health"
-healthcheckTimeout = 100
-restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 10
+startCommand = "npm start"
 
 # Deploy from project root to include !docs folder
 [[services]]
 name = "backend"
 source = "."
-startCommand = "npm run start:backend"
+startCommand = "cd backend && npm start"
 
 # Environment variables
 [deploy.envs]
