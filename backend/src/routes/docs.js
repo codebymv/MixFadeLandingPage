@@ -5,29 +5,52 @@ const router = express.Router();
 
 // Function to find the docs directory
 function findDocsPath() {
+  console.log('Starting docs folder search...');
+  console.log('Current working directory:', process.cwd());
+  console.log('__dirname:', __dirname);
+  
+  // Possible locations for the docs folder (based on working projects)
   const possiblePaths = [
-    // Railway deployment paths (from backend directory)
-    path.join(__dirname, '../../docs'),
-    path.join(process.cwd(), 'backend/docs'),
-    // Local development paths
-    path.join(__dirname, '../../../!docs'),
-    path.join(__dirname, '../../!docs'),
-    path.join(__dirname, '../!docs'),
-    path.join(process.cwd(), '!docs'),
-    path.join(process.cwd(), 'docs'),
-    path.join(__dirname, '../../../docs')
+    path.join(__dirname, '../../docs'),          // Copied docs folder in backend/docs
+    path.join(__dirname, '../../../!docs'),      // Development: backend/src/routes -> project root
+    path.join(__dirname, '../../!docs'),         // Production scenario 1: backend -> project root
+    path.join(__dirname, '../!docs'),            // Production scenario 2: src -> project root
+    path.join(__dirname, '../../../../!docs'),   // Production scenario 3: deeper nesting
+    path.join(process.cwd(), '!docs'),          // Using process working directory
+    path.join(process.cwd(), '../!docs'),       // One level up from working directory
+    path.join(process.cwd(), 'docs'),           // Copied docs in working directory
+    path.join(process.cwd(), 'backend/docs'),   // Copied docs in backend subfolder
   ];
 
+  console.log('Checking paths:', possiblePaths);
+
+  // Try each path and return the first one that exists
   for (const docsPath of possiblePaths) {
-    console.log(`🔍 Checking docs path: ${docsPath}`);
-    if (fs.existsSync(docsPath)) {
-      console.log(`✅ Found docs directory at: ${docsPath}`);
-      return docsPath;
+    try {
+      console.log(`Checking path: ${docsPath}`);
+      // Check if the path exists and is a directory
+      const stats = fs.statSync(docsPath);
+      if (stats.isDirectory()) {
+        console.log(`✅ Found docs folder at: ${docsPath}`);
+        // List contents to verify
+        try {
+          const contents = fs.readdirSync(docsPath);
+          console.log(`Contents: ${contents.join(', ')}`);
+        } catch (e) {
+          console.log('Could not list contents');
+        }
+        return docsPath;
+      }
+    } catch (error) {
+      console.log(`❌ Path not found: ${docsPath} - ${error.message}`);
+      // Path doesn't exist, try next one
+      continue;
     }
   }
 
-  console.warn('⚠️ Docs directory not found, using fallback');
-  return null;
+  // If no docs folder found, log error and use default
+  console.error('!docs folder not found in any expected location. Tried:', possiblePaths);
+  return path.join(__dirname, '../../../!docs'); // fallback to original path
 }
 
 // Get document content
