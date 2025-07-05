@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useTheme } from 'next-themes';
+// Removed useTheme import - using consistent MFLanding styling
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Menu, X, ArrowLeft } from 'lucide-react';
@@ -10,7 +10,6 @@ import Footer from '@/components/Footer';
 
 const DocsPage: React.FC = () => {
   const { '*': docPath } = useParams<{ '*': string }>();
-  const { theme } = useTheme();
   const navigate = useNavigate();
   const [markdownContent, setMarkdownContent] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +21,7 @@ const DocsPage: React.FC = () => {
   const mainContentRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
-  // Consistent MFLanding theme colors
+  // MFLanding theme colors and styling
   const bgColor = 'bg-slate-900';
   const sidebarBg = 'glass-panel border-slate-700/50';
   const textColor = 'text-slate-100';
@@ -119,10 +118,10 @@ const DocsPage: React.FC = () => {
               />
             </svg>
           )}
-                      <span className={`truncate font-medium ${
+                      <span className={`truncate font-semibold ${
               docPath === item.path || (docPath === undefined && item.path === 'getting-started') 
                 ? 'text-gradient-emerald-purple'
-                : ''
+                : 'text-slate-300'
             }`}>{formatName(item.name)}</span>
         </Link>
         {item.children && (
@@ -135,7 +134,7 @@ const DocsPage: React.FC = () => {
   };
 
   // Helper function to find an item by path in the structure
-  const findItemByPath = useCallback((items: DocStructure[], path: string): DocStructure | null => {
+  const findItemByPath = (items: DocStructure[], path: string): DocStructure | null => {
     for (const item of items) {
       if (item.path === path) {
         return item;
@@ -146,7 +145,7 @@ const DocsPage: React.FC = () => {
       }
     }
     return null;
-  }, []);
+  };
 
   useEffect(() => {
     const fetchDocContent = async () => {
@@ -191,18 +190,37 @@ const DocsPage: React.FC = () => {
 
     fetchDocContent();
     fetchDocStructure();
-  }, [docPath, findItemByPath]);
+  }, [docPath]);
 
-  // Sync sidebar height with main content (desktop only)
+  // Hybrid solution: Intelligent height management for both short and long pages
   useEffect(() => {
     const syncHeights = () => {
       if (mainContentRef.current && sidebarRef.current) {
         const isDesktop = window.innerWidth >= 1024; // lg breakpoint
         
         if (isDesktop) {
-          // On desktop, sync height with main content
+          // Get measurements
           const mainContentHeight = mainContentRef.current.offsetHeight;
-          sidebarRef.current.style.height = `${mainContentHeight}px`;
+          const sidebarScrollContainer = sidebarRef.current.querySelector('.overflow-y-auto');
+          
+          if (sidebarScrollContainer) {
+            // Get natural sidebar content height
+            const sidebarContentHeight = sidebarScrollContainer.scrollHeight;
+            const sidebarHeader = sidebarRef.current.querySelector('.p-6.border-b') as HTMLElement;
+            const headerHeight = sidebarHeader?.offsetHeight || 0;
+            const totalSidebarNeeded = sidebarContentHeight + headerHeight;
+            
+            // Minimum height to ensure scrollbars appear (viewport constraint)
+            const minSidebarHeight = Math.min(window.innerHeight - 80, totalSidebarNeeded);
+            
+            // Use the larger of: main content height or minimum needed height
+            const finalHeight = Math.max(mainContentHeight, minSidebarHeight);
+            
+            sidebarRef.current.style.height = `${finalHeight}px`;
+          } else {
+            // Fallback: use itemize.cloud approach
+            sidebarRef.current.style.height = `${mainContentHeight}px`;
+          }
         } else {
           // On mobile, clear any explicit height to let CSS take over
           sidebarRef.current.style.height = '';
@@ -210,14 +228,16 @@ const DocsPage: React.FC = () => {
       }
     };
 
-    // Initial sync
-    syncHeights();
+    // Initial sync with slight delay to ensure DOM is ready
+    setTimeout(syncHeights, 100);
 
     // Sync on window resize
     window.addEventListener('resize', syncHeights);
 
     // Sync when content changes (using MutationObserver)
-    const observer = new MutationObserver(syncHeights);
+    const observer = new MutationObserver(() => {
+      setTimeout(syncHeights, 50);
+    });
     if (mainContentRef.current) {
       observer.observe(mainContentRef.current, {
         childList: true,
@@ -232,17 +252,53 @@ const DocsPage: React.FC = () => {
     };
   }, [markdownContent]);
 
-  // Prevent body scroll when sidebar is open on mobile
+  // Prevent body scroll when sidebar is open on mobile only
   useEffect(() => {
-    if (isSidebarOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    const handleScrollPrevention = () => {
+      const isMobile = window.innerWidth < 1024; // lg breakpoint
+      
+      if (isSidebarOpen && isMobile) {
+        // Only prevent body scroll on mobile when sidebar overlay is open
+        document.body.style.overflow = 'hidden';
+      } else {
+        // Allow normal scrolling on desktop or when sidebar is closed
+        document.body.style.overflow = '';
+      }
+    };
+
+    handleScrollPrevention();
+    
+    // Also handle window resize to ensure proper scroll state
+    window.addEventListener('resize', handleScrollPrevention);
+    
     return () => {
-      document.body.style.overflow = 'unset';
+      // Always restore scroll on cleanup
+      document.body.style.overflow = '';
+      window.removeEventListener('resize', handleScrollPrevention);
     };
   }, [isSidebarOpen]);
+
+  // Reset scroll state when navigating between pages
+  useEffect(() => {
+    // Ensure scroll state is properly reset when switching pages
+    const resetScrollState = () => {
+      // Reset body scroll to ensure it works properly on new pages
+      document.body.style.overflow = '';
+      
+      // Reset sidebar height to allow natural calculation
+      if (sidebarRef.current) {
+        sidebarRef.current.style.height = '';
+        
+        // Reset any scroll positions that might be stuck
+        const scrollContainer = sidebarRef.current.querySelector('.overflow-y-auto');
+        if (scrollContainer) {
+          scrollContainer.scrollTop = 0;
+        }
+      }
+    };
+
+    resetScrollState();
+  }, [docPath]);
 
   // Keyboard shortcut to focus search (press "/" key)
   useEffect(() => {
@@ -267,7 +323,7 @@ const DocsPage: React.FC = () => {
     return (
       <div className={`min-h-screen flex items-center justify-center ${bgColor}`} style={{ fontFamily: '"Inter", sans-serif' }}>
         <div className={`max-w-md mx-auto p-8 text-center rounded-lg border ${borderColor} ${sidebarBg} ${shadowClass}`}>
-          <div className={`text-lg font-medium mb-2 ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>
+          <div className="text-lg font-semibold mb-2 text-red-400">
             Documentation Error
           </div>
           <div className={mutedTextColor}>
@@ -279,13 +335,8 @@ const DocsPage: React.FC = () => {
   }
 
   return (
-    <div className={`min-h-screen flex ${bgColor} ${textColor} relative overflow-hidden`} style={{ fontFamily: '"Inter", sans-serif' }}>
-      {/* Background gradient pattern */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-emerald-500/5 via-transparent to-purple-500/5 rotate-12 transform scale-150"></div>
-        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-purple-500/5 via-transparent to-emerald-500/5 -rotate-12 transform scale-150"></div>
-      </div>
-
+    <div className={`min-h-screen flex flex-col ${bgColor} ${textColor} pt-20`} style={{ fontFamily: '"Inter", sans-serif', outline: 'none !important', boxShadow: 'none !important' }}>
+      
       {/* SVG Gradient Definition */}
       <svg width="0" height="0" style={{ position: 'absolute' }}>
         <defs>
@@ -296,12 +347,12 @@ const DocsPage: React.FC = () => {
         </defs>
       </svg>
       
-      <div className="flex w-full relative z-10">
+      <div className="flex w-full flex-grow">
       {/* Sidebar */}
-      <div ref={sidebarRef} className={`w-80 ${sidebarBg} fixed inset-y-0 left-0 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:self-stretch z-30 border-r ${borderColor} ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col`} style={{ fontFamily: '"Inter", sans-serif' }}>
+      <div ref={sidebarRef} className={`w-80 ${sidebarBg} fixed top-20 bottom-0 left-0 transform transition-transform duration-300 ease-in-out lg:relative lg:top-0 lg:translate-x-0 lg:self-stretch z-30 border-r ${borderColor} ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col`} style={{ fontFamily: '"Inter", sans-serif' }}>
         {/* Fixed header area */}
-        <div className="p-6 border-b border-slate-700/50 bg-inherit">
-          <h2 className={`text-xl font-bold mb-6 ${textColor} text-gradient-emerald-purple`} style={{ fontFamily: '"Inter", sans-serif' }}>Documentation</h2>
+        <div className="p-6 border-b border-slate-600 bg-inherit">
+          <h2 className={`text-xl font-bold mb-6 text-gradient-emerald-purple`} style={{ fontFamily: '"Inter", sans-serif' }}>Documentation</h2>
 
           {/* Search box */}
           <div className="mb-6">
@@ -315,7 +366,7 @@ const DocsPage: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search documentation... (Press / to focus)"
-                className={`w-full pl-10 pr-4 py-2 rounded-lg border ${borderColor} bg-slate-800/50 text-slate-100 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors backdrop-blur-sm`}
+                className={`w-full pl-10 pr-4 py-2 rounded-lg border ${borderColor} bg-slate-800/50 text-slate-100 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-colors backdrop-blur-sm`}
                 style={{ fontFamily: '"Inter", sans-serif' }}
               />
               {searchQuery && (
@@ -364,7 +415,7 @@ const DocsPage: React.FC = () => {
                     <div className="text-sm">No results found for "{searchQuery}"</div>
                     <button
                       onClick={() => setSearchQuery('')}
-                      className={`text-xs mt-2 text-emerald-400 hover:text-emerald-300 transition-colors`}
+                      className="text-xs mt-2 text-emerald-400 hover:text-emerald-300 transition-colors font-medium"
                     >
                       Clear search
                     </button>
@@ -387,7 +438,7 @@ const DocsPage: React.FC = () => {
       )}
 
       {/* Main Content */}
-      <div ref={mainContentRef} className="flex-1 min-h-0">
+      <div ref={mainContentRef} className="flex-1 min-h-0" style={{ outline: 'none !important', boxShadow: 'none !important' }}>
         {/* Back button and Mobile menu - responsive layout */}
         <div className="py-4">
           {/* Desktop: Back button aligned with logo using container positioning */}
@@ -399,7 +450,7 @@ const DocsPage: React.FC = () => {
                 <Button
                   onClick={() => navigate(-1)}
                   size="sm"
-                  className="bg-gradient-to-r from-emerald-500 to-purple-500 hover:from-emerald-600 hover:to-purple-600 text-white font-normal"
+                  className="bg-gradient-to-r from-emerald-500 to-purple-500 hover:from-emerald-600 hover:to-purple-600 text-white font-semibold transition-all duration-300"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back
@@ -414,7 +465,7 @@ const DocsPage: React.FC = () => {
               <Button
                 onClick={() => navigate('/')}
                 size="sm"
-                className="bg-gradient-to-r from-emerald-500 to-purple-500 hover:from-emerald-600 hover:to-purple-600 text-white font-normal"
+                className="bg-gradient-to-r from-emerald-500 to-purple-500 hover:from-emerald-600 hover:to-purple-600 text-white font-semibold transition-all duration-300"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
@@ -422,7 +473,7 @@ const DocsPage: React.FC = () => {
 
               <button
                 onClick={() => setIsSidebarOpen(true)}
-                className={`flex items-center px-4 py-3 rounded-lg ${buttonBg} ${textColor} transition-colors shadow-sm`}
+                className={`flex items-center px-4 py-3 rounded-lg ${buttonBg} ${textColor} transition-all duration-300 shadow-sm font-semibold`}
                 style={{ fontFamily: '"Inter", sans-serif' }}
               >
                 <Menu className="h-5 w-5 mr-3" />
@@ -432,49 +483,47 @@ const DocsPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8">
-          {/* Glass panel container for content */}
-          <div className="glass-panel p-8 rounded-2xl">
-            {loading && !markdownContent ? (
-              <div className={`text-center py-12 ${mutedTextColor}`} style={{ fontFamily: '"Inter", sans-serif' }}>
-                <div className="text-lg">Loading documentation...</div>
+
+
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+
+          {loading && !markdownContent ? (
+            <div className={`text-center py-12 ${mutedTextColor}`} style={{ fontFamily: '"Inter", sans-serif' }}>
+              <div className="text-lg">Loading documentation...</div>
+            </div>
+          ) : (
+            <div 
+              className="prose lg:prose-xl max-w-none prose-invert prose-headings:text-gradient-emerald-purple prose-p:text-slate-300 prose-strong:text-slate-200 prose-code:text-emerald-400 prose-pre:bg-slate-800/50 prose-blockquote:text-slate-300 prose-blockquote:border-emerald-500/50 prose-a:text-emerald-400 prose-a:hover:text-emerald-300"
+              style={{ 
+                fontFamily: '"Inter", sans-serif',
+                '--tw-prose-body': '"Inter", sans-serif',
+                '--tw-prose-headings': '"Inter", sans-serif',
+                '--tw-prose-lead': '"Inter", sans-serif',
+                '--tw-prose-links': '"Inter", sans-serif',
+                '--tw-prose-bold': '"Inter", sans-serif',
+                '--tw-prose-counters': '"Inter", sans-serif',
+                '--tw-prose-bullets': '"Inter", sans-serif',
+                '--tw-prose-hr': '"Inter", sans-serif',
+                '--tw-prose-quotes': '"Inter", sans-serif',
+                '--tw-prose-quote-borders': '"Inter", sans-serif',
+                '--tw-prose-captions': '"Inter", sans-serif',
+                '--tw-prose-kbd': '"Inter", sans-serif',
+                '--tw-prose-code': '"Inter", sans-serif',
+                '--tw-prose-pre-code': '"Inter", sans-serif',
+                '--tw-prose-th-borders': '"Inter", sans-serif'
+              } as React.CSSProperties}
+            >
+              <div className="prose prose-lg max-w-none prose-invert prose-headings:text-white prose-p:text-slate-200 prose-li:text-slate-200 prose-strong:text-white">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {markdownContent}
+                </ReactMarkdown>
               </div>
-            ) : (
-              <div 
-                className={`prose lg:prose-xl max-w-none prose-invert prose-headings:text-slate-100 prose-p:text-slate-300 prose-strong:text-slate-200 prose-code:text-slate-200 prose-pre:bg-slate-800/50 prose-blockquote:text-slate-300 prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:text-emerald-300`}
-                style={{ 
-                  fontFamily: '"Inter", sans-serif',
-                  '--tw-prose-body': '"Inter", sans-serif',
-                  '--tw-prose-headings': '"Inter", sans-serif',
-                  '--tw-prose-lead': '"Inter", sans-serif',
-                  '--tw-prose-links': '"Inter", sans-serif',
-                  '--tw-prose-bold': '"Inter", sans-serif',
-                  '--tw-prose-counters': '"Inter", sans-serif',
-                  '--tw-prose-bullets': '"Inter", sans-serif',
-                  '--tw-prose-hr': '"Inter", sans-serif',
-                  '--tw-prose-quotes': '"Inter", sans-serif',
-                  '--tw-prose-quote-borders': '"Inter", sans-serif',
-                  '--tw-prose-captions': '"Inter", sans-serif',
-                  '--tw-prose-kbd': '"Inter", sans-serif',
-                  '--tw-prose-code': '"Inter", sans-serif',
-                  '--tw-prose-pre-code': '"Inter", sans-serif',
-                  '--tw-prose-th-borders': '"Inter", sans-serif'
-                } as React.CSSProperties}
-              >
-                <div className={`prose prose-lg max-w-none prose-invert prose-headings:text-white prose-p:text-gray-200 prose-li:text-gray-200 prose-strong:text-white`}>
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {markdownContent}
-                  </ReactMarkdown>
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
-        
-        {/* Footer */}
-        <Footer />
       </div>
       </div>
+      <Footer />
     </div>
   );
 };
