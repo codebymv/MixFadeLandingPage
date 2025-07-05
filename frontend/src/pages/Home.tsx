@@ -19,11 +19,11 @@ const FEATURE_IMAGES = [
 
 const Home = () => {
 
-  const { imagesLoaded: logosLoaded, loadedImages: loadedLogos, getImageSrc: getLogoSrc } = useImagePreloader({
+  const { imagesLoaded: logosLoaded, loadedImages: loadedLogos, getImageSrc: getLogoSrc, handleImageLoad: handleLogoLoad, handleImageError: handleLogoError } = useImagePreloader({
     images: LOGO_IMAGES
   });
 
-  const { imagesLoaded: featuresLoaded, loadedImages: loadedFeatures, getImageSrc: getFeatureSrc } = useImagePreloader({
+  const { imagesLoaded: featuresLoaded, loadedImages: loadedFeatures, getImageSrc: getFeatureSrc, handleImageLoad: handleFeatureLoad, handleImageError: handleFeatureError } = useImagePreloader({
     images: FEATURE_IMAGES
   });
 
@@ -58,6 +58,8 @@ const Home = () => {
                        loading="eager"
                        decoding="sync"
                        style={{ imageRendering: 'auto' }}
+                       onLoad={() => handleLogoLoad("/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.png")}
+                       onError={() => handleLogoError("/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.png")}
                      />
                    </div>
                    
@@ -75,6 +77,8 @@ const Home = () => {
                        loading="eager"
                        decoding="sync"
                        style={{ imageRendering: 'auto' }}
+                       onLoad={() => handleLogoLoad("/OS_Full_Logo_transparent.png")}
+                       onError={() => handleLogoError("/OS_Full_Logo_transparent.png")}
                      />
                    </div>
                  </div>
@@ -135,6 +139,8 @@ const Home = () => {
                   loading="eager"
                   decoding="sync"
                   style={{ imageRendering: 'auto' }}
+                  onLoad={() => handleFeatureLoad("/ui.png")}
+                  onError={() => handleFeatureError("/ui.png")}
                 />
               </div>
             </div>
@@ -161,6 +167,8 @@ const Home = () => {
                   className={`w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105 ${allFeaturesReady ? 'block' : 'hidden'}`}
                   loading="eager"
                   decoding="sync"
+                  onLoad={() => handleFeatureLoad("/dj.png")}
+                  onError={() => handleFeatureError("/dj.png")}
                 />
               </div>
               
@@ -197,6 +205,8 @@ const Home = () => {
                   className={`w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105 ${allFeaturesReady ? 'block' : 'hidden'}`}
                   loading="eager"
                   decoding="sync"
+                  onLoad={() => handleFeatureLoad("/processing.png")}
+                  onError={() => handleFeatureError("/processing.png")}
                 />
               </div>
               
@@ -225,6 +235,8 @@ const Home = () => {
                   className={`w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105 ${allFeaturesReady ? 'block' : 'hidden'}`}
                   loading="eager"
                   decoding="sync"
+                  onLoad={() => handleFeatureLoad("/fileswap.png")}
+                  onError={() => handleFeatureError("/fileswap.png")}
                 />
               </div>
               

@@ -404,11 +404,30 @@ All colors MUST be HSL.
     backface-visibility: hidden;
     transform: translateZ(0);
     will-change: opacity;
+    /* Prevent image flickering during transitions */
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    -ms-backface-visibility: hidden;
+    /* Force hardware acceleration */
+    -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    -o-transform: translateZ(0);
   }
   
   /* Enhanced skeleton loading for mobile */
   .logo-skeleton {
     animation-duration: 1.5s;
     animation-timing-function: ease-in-out;
+  }
+  
+  /* Specific fixes for hero images */
+  .hero-fade-in img {
+    /* Prevent reflow during loading */
+    display: block;
+    max-width: 100%;
+    height: auto;
+    /* Smooth transitions */
+    transition: opacity 0.3s ease;
   }
 }
