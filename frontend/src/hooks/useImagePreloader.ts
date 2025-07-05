@@ -64,10 +64,13 @@ export const useImagePreloader = ({
           onError?.(new Error(`${failed.length} images failed to load`));
         }
         
-        // Consider successful if at least one image loads, or if explicitly requested
-        setImagesLoaded(successful > 0 || images.length === 0);
-        setIsLoading(false);
-        onLoad?.();
+        // Add a small delay to prevent mobile flash/reload issues
+        // This ensures smooth transition between loading and loaded states
+        setTimeout(() => {
+          setImagesLoaded(successful > 0 || images.length === 0);
+          setIsLoading(false);
+          onLoad?.();
+        }, 100); // 100ms delay to stabilize state transitions
       })
       .catch(error => {
         console.error('Critical error during image preloading:', error);
@@ -85,4 +88,4 @@ export const useImagePreloader = ({
     loadedImages,
     progress
   };
-}; 
+};

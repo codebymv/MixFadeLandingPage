@@ -289,18 +289,27 @@ All colors MUST be HSL.
   }
 }
 
+/* CSS Custom Properties for consistent gradient */
+:root {
+  --gradient-emerald-purple: linear-gradient(to right, #10b981, #a855f7);
+}
+
 .text-gradient-emerald-purple {
-  background: linear-gradient(to right, rgb(16, 185, 129), rgb(168, 85, 247));
+  background: linear-gradient(90deg, #10b981 0%, #a855f7 100%);
   -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
+  display: inline-block;
 }
 
 .group:hover .group-hover\:text-gradient-emerald-purple {
-  background: linear-gradient(to right, rgb(16, 185, 129), rgb(168, 85, 247));
+  background: linear-gradient(90deg, #10b981 0%, #a855f7 100%);
   -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
+  display: inline-block;
 }
 
 .border-gradient-hover:hover {
@@ -352,16 +361,39 @@ All colors MUST be HSL.
 }
 
 .hero-fade-in {
-  animation: heroFadeIn 0.8s ease-out forwards;
+  animation: heroFadeIn 0.6s ease-out forwards;
+  /* Ensure smooth rendering on mobile devices */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: opacity, transform;
 }
 
 @keyframes heroFadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(15px) translateZ(0);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) translateZ(0);
+  }
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  .hero-fade-in {
+    animation-duration: 0.5s;
+    animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  @keyframes heroFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px) translateZ(0);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) translateZ(0);
+    }
   }
 }
