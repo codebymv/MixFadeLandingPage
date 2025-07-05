@@ -396,4 +396,19 @@ All colors MUST be HSL.
       transform: translateY(0) translateZ(0);
     }
   }
+  
+  /* Prevent image flashing on mobile */
+  img {
+    image-rendering: auto;
+    image-rendering: optimizeQuality;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    will-change: opacity;
+  }
+  
+  /* Enhanced skeleton loading for mobile */
+  .logo-skeleton {
+    animation-duration: 1.5s;
+    animation-timing-function: ease-in-out;
+  }
 }

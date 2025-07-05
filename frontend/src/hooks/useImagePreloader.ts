@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface UseImagePreloaderOptions {
   images: string[];
@@ -11,6 +11,7 @@ interface UseImagePreloaderReturn {
   imagesLoaded: boolean;
   loadedImages: Set<string>;
   progress: number;
+  getImageSrc: (originalSrc: string) => string;
 }
 
 export const useImagePreloader = ({
@@ -21,6 +22,10 @@ export const useImagePreloader = ({
   const [isLoading, setIsLoading] = useState(true);
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
+  
+  // Keep preloaded images in memory to prevent re-fetching
+  const preloadedImagesRef = useRef<Map<string, HTMLImageElement>>(new Map());
+  const imageElementsRef = useRef<Map<string, HTMLImageElement>>(new Map());
 
   useEffect(() => {
     if (images.length === 0) {
@@ -35,9 +40,23 @@ export const useImagePreloader = ({
 
     const preloadImages = images.map(src => {
       return new Promise<string>((resolve, reject) => {
+        // Check if we already have this image preloaded
+        if (preloadedImagesRef.current.has(src)) {
+          setLoadedImages(prev => new Set([...prev, src]));
+          resolve(src);
+          return;
+        }
+
         const img = new Image();
         
+        // Set crossOrigin to enable better caching
+        img.crossOrigin = 'anonymous';
+        
         img.onload = () => {
+          // Store the loaded image in memory
+          preloadedImagesRef.current.set(src, img);
+          imageElementsRef.current.set(src, img);
+          
           setLoadedImages(prev => new Set([...prev, src]));
           resolve(src);
         };
@@ -47,6 +66,7 @@ export const useImagePreloader = ({
           reject(error);
         };
         
+        // Force cache-friendly loading
         img.src = src;
       });
     });
@@ -64,13 +84,12 @@ export const useImagePreloader = ({
           onError?.(new Error(`${failed.length} images failed to load`));
         }
         
-        // Add a small delay to prevent mobile flash/reload issues
-        // This ensures smooth transition between loading and loaded states
+        // Increased delay for mobile stability
         setTimeout(() => {
           setImagesLoaded(successful > 0 || images.length === 0);
           setIsLoading(false);
           onLoad?.();
-        }, 100); // 100ms delay to stabilize state transitions
+        }, 150); // Increased from 100ms to 150ms for better mobile performance
       })
       .catch(error => {
         console.error('Critical error during image preloading:', error);
@@ -80,12 +99,23 @@ export const useImagePreloader = ({
       });
   }, [images]); // Removed onLoad and onError from dependencies to prevent infinite loop
 
+  // Function to get the cached image source or fallback to original
+  const getImageSrc = (originalSrc: string): string => {
+    const preloadedImage = preloadedImagesRef.current.get(originalSrc);
+    if (preloadedImage && preloadedImage.complete) {
+      // Return the same src but ensure it's from cache
+      return originalSrc;
+    }
+    return originalSrc;
+  };
+
   const progress = images.length > 0 ? (loadedImages.size / images.length) * 100 : 100;
 
   return {
     isLoading,
     imagesLoaded,
     loadedImages,
-    progress
+    progress,
+    getImageSrc
   };
 };
