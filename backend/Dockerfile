@@ -13,8 +13,9 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install --production
 
-# Copy source code
+# Copy source code and docs
 COPY src/ ./src/
+COPY docs/ ./docs/
 
 # Change ownership to nodejs user
 RUN chown -R nodejs:nodejs /app
