@@ -20,7 +20,7 @@
     "postbuild": "echo 'Build completed with docs synced'",
     "build:frontend": "cd frontend && npm run build",
     "build:backend": "cd backend && npm run build",
-    "railway:build": "npm run build:backend && npm run build:frontend",
+    "railway:build": "npm run docs:sync && npm run build:backend && npm run build:frontend",
     "railway:start": "npm run start:backend",
     "lint": "cd frontend && npm run lint",
     "test": "cd frontend && npm run test",
