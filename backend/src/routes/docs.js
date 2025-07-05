@@ -6,6 +6,10 @@ const router = express.Router();
 // Function to find the docs directory
 function findDocsPath() {
   const possiblePaths = [
+    // Railway deployment paths (from backend directory)
+    path.join(__dirname, '../../docs'),
+    path.join(process.cwd(), 'backend/docs'),
+    // Local development paths
     path.join(__dirname, '../../../!docs'),
     path.join(__dirname, '../../!docs'),
     path.join(__dirname, '../!docs'),
