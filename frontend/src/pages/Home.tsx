@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Download, Headphones, Zap, Files } from "lucide-react";
 import Footer from "@/components/Footer";
-import { useImagePreloader } from "@/hooks/useImagePreloader";
+import { useState } from "react";
 
 // Move images array outside component to prevent recreation on every render
 const LOGO_IMAGES = [
@@ -18,17 +18,19 @@ const FEATURE_IMAGES = [
 ];
 
 const Home = () => {
+  const [logoLoaded, setLogoLoaded] = useState<Set<string>>(new Set());
+  const [featureLoaded, setFeatureLoaded] = useState<Set<string>>(new Set());
 
-  const { imagesLoaded: logosLoaded, loadedImages: loadedLogos, getImageSrc: getLogoSrc, handleImageLoad: handleLogoLoad, handleImageError: handleLogoError } = useImagePreloader({
-    images: LOGO_IMAGES
-  });
+  const handleLogoLoad = (src: string) => {
+    setLogoLoaded(prev => new Set([...prev, src]));
+  };
 
-  const { imagesLoaded: featuresLoaded, loadedImages: loadedFeatures, getImageSrc: getFeatureSrc, handleImageLoad: handleFeatureLoad, handleImageError: handleFeatureError } = useImagePreloader({
-    images: FEATURE_IMAGES
-  });
+  const handleFeatureLoad = (src: string) => {
+    setFeatureLoaded(prev => new Set([...prev, src]));
+  };
 
-  const allLogosReady = logosLoaded && loadedLogos.size === LOGO_IMAGES.length;
-  const allFeaturesReady = featuresLoaded && loadedFeatures.size === FEATURE_IMAGES.length;
+  const allLogosReady = logoLoaded.size === LOGO_IMAGES.length;
+  const allFeaturesReady = featureLoaded.size === FEATURE_IMAGES.length;
 
   return (
     <div className="min-h-screen bg-slate-900">
@@ -44,45 +46,53 @@ const Home = () => {
           <div className="mb-8">
             {/* Logo Section with MixFade and OpaqueSound logos */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 mb-6">
-                             {/* Logo Container with Loading State */}
-               <div className={`transition-opacity duration-500 ${allLogosReady ? 'opacity-100 hero-fade-in' : 'opacity-0'}`}>
-                 <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6">
-                   {/* MixFade Logo */}
-                   <div className="relative">
-                     {/* Enhanced skeleton placeholder */}
-                     <div className={`w-80 h-20 rounded-lg logo-skeleton ${allLogosReady ? 'hidden' : 'block'}`} />
-                     <img 
-                       src={getLogoSrc("/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.png")} 
-                       alt="MixFade Logo" 
-                       className={`w-80 sm:w-80 h-auto opacity-90 transition-opacity duration-300 ${allLogosReady ? 'block' : 'hidden'}`}
-                       loading="eager"
-                       decoding="sync"
-                       style={{ imageRendering: 'auto' }}
-                       onLoad={() => handleLogoLoad("/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.png")}
-                       onError={() => handleLogoError("/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.png")}
-                     />
-                   </div>
-                   
-                   {/* "by" text - separate row on mobile, inline on desktop */}
-                   <span className="text-slate-400 text-lg sm:text-xl font-medium">by</span>
-                   
-                   {/* OpaqueSound Logo */}
-                   <div className="relative">
-                     {/* Enhanced skeleton placeholder */}
-                     <div className={`w-64 h-16 rounded-lg logo-skeleton ${allLogosReady ? 'hidden' : 'block'}`} />
-                     <img 
-                       src={getLogoSrc("/OS_Full_Logo_transparent.png")} 
-                       alt="OpaqueSound Logo" 
-                       className={`w-64 sm:w-64 h-auto opacity-90 transition-opacity duration-300 ${allLogosReady ? 'block' : 'hidden'}`}
-                       loading="eager"
-                       decoding="sync"
-                       style={{ imageRendering: 'auto' }}
-                       onLoad={() => handleLogoLoad("/OS_Full_Logo_transparent.png")}
-                       onError={() => handleLogoError("/OS_Full_Logo_transparent.png")}
-                     />
-                   </div>
-                 </div>
-               </div>
+              {/* Logo Container - Direct approach */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6">
+                {/* MixFade Logo */}
+                <div className="relative w-80 h-20">
+                  {/* Skeleton - only show when image not loaded */}
+                  {!logoLoaded.has(LOGO_IMAGES[0]) && (
+                    <div className="absolute inset-0 w-80 h-20 rounded-lg logo-skeleton" />
+                  )}
+                  <img 
+                    src="/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.png" 
+                    alt="MixFade Logo" 
+                    className={`w-80 sm:w-80 h-auto opacity-90 transition-opacity duration-500 ${logoLoaded.has(LOGO_IMAGES[0]) ? 'opacity-90' : 'opacity-0'}`}
+                    loading="eager"
+                    decoding="sync"
+                    onLoad={() => handleLogoLoad(LOGO_IMAGES[0])}
+                    style={{ 
+                      imageRendering: 'auto',
+                      backfaceVisibility: 'hidden',
+                      transform: 'translateZ(0)'
+                    }}
+                  />
+                </div>
+                
+                {/* "by" text */}
+                <span className="text-slate-400 text-lg sm:text-xl font-medium">by</span>
+                
+                {/* OpaqueSound Logo */}
+                <div className="relative w-64 h-16">
+                  {/* Skeleton - only show when image not loaded */}
+                  {!logoLoaded.has(LOGO_IMAGES[1]) && (
+                    <div className="absolute inset-0 w-64 h-16 rounded-lg logo-skeleton" />
+                  )}
+                  <img 
+                    src="/OS_Full_Logo_transparent.png" 
+                    alt="OpaqueSound Logo" 
+                    className={`w-64 sm:w-64 h-auto opacity-90 transition-opacity duration-500 ${logoLoaded.has(LOGO_IMAGES[1]) ? 'opacity-90' : 'opacity-0'}`}
+                    loading="eager"
+                    decoding="sync"
+                    onLoad={() => handleLogoLoad(LOGO_IMAGES[1])}
+                    style={{ 
+                      imageRendering: 'auto',
+                      backfaceVisibility: 'hidden',
+                      transform: 'translateZ(0)'
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
           
@@ -107,8 +117,6 @@ const Home = () => {
                 variant="outline" 
                 size="lg" 
                 className="border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white px-8 py-4 text-lg border-gradient-hover"
-                // className="border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-emerald-400 transition-all duration-200 border-gradient-hover"
-
               >
                 View Features
               </Button>
@@ -133,14 +141,13 @@ const Home = () => {
                 {/* Loading skeleton */}
                 <div className={`w-full h-[50vh] sm:h-96 bg-slate-700/30 animate-pulse rounded-none sm:rounded-lg ${allFeaturesReady ? 'hidden' : 'block'}`} />
                 <img 
-                  src={getFeatureSrc("/ui.png")} 
+                  src="/ui.png" 
                   alt="MixFade Complete Interface" 
                   className={`w-full h-[50vh] sm:h-auto object-cover sm:object-contain transition-all duration-300 hover:scale-105 ${allFeaturesReady ? 'block' : 'hidden'}`}
                   loading="eager"
                   decoding="sync"
                   style={{ imageRendering: 'auto' }}
                   onLoad={() => handleFeatureLoad("/ui.png")}
-                  onError={() => handleFeatureError("/ui.png")}
                 />
               </div>
             </div>
@@ -162,13 +169,12 @@ const Home = () => {
                 {/* Loading skeleton */}
                 <div className={`w-full h-full bg-slate-700/30 animate-pulse rounded-lg ${allFeaturesReady ? 'hidden' : 'block'}`} />
                 <img 
-                  src={getFeatureSrc("/dj.png")} 
+                  src="/dj.png" 
                   alt="DJ-Style Playback Interface" 
                   className={`w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105 ${allFeaturesReady ? 'block' : 'hidden'}`}
                   loading="eager"
                   decoding="sync"
                   onLoad={() => handleFeatureLoad("/dj.png")}
-                  onError={() => handleFeatureError("/dj.png")}
                 />
               </div>
               
@@ -200,13 +206,12 @@ const Home = () => {
                 {/* Loading skeleton */}
                 <div className={`w-full h-full bg-slate-700/30 animate-pulse rounded-lg ${allFeaturesReady ? 'hidden' : 'block'}`} />
                 <img 
-                  src={getFeatureSrc("/processing.png")} 
+                  src="/processing.png" 
                   alt="Real-time Processing Interface" 
                   className={`w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105 ${allFeaturesReady ? 'block' : 'hidden'}`}
                   loading="eager"
                   decoding="sync"
                   onLoad={() => handleFeatureLoad("/processing.png")}
-                  onError={() => handleFeatureError("/processing.png")}
                 />
               </div>
               
@@ -230,13 +235,12 @@ const Home = () => {
                 {/* Loading skeleton */}
                 <div className={`w-full h-full bg-slate-700/30 animate-pulse rounded-lg ${allFeaturesReady ? 'hidden' : 'block'}`} />
                 <img 
-                  src={getFeatureSrc("/fileswap.png")} 
+                  src="/fileswap.png" 
                   alt="File Swapping Interface" 
                   className={`w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105 ${allFeaturesReady ? 'block' : 'hidden'}`}
                   loading="eager"
                   decoding="sync"
                   onLoad={() => handleFeatureLoad("/fileswap.png")}
-                  onError={() => handleFeatureError("/fileswap.png")}
                 />
               </div>
               

@@ -421,13 +421,24 @@ All colors MUST be HSL.
     animation-timing-function: ease-in-out;
   }
   
-  /* Specific fixes for hero images */
-  .hero-fade-in img {
-    /* Prevent reflow during loading */
+  /* Mobile-specific logo loading */
+  .relative img {
+    /* Ensure smooth opacity transitions */
+    transition: opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* Prevent layout shift during loading */
     display: block;
-    max-width: 100%;
+    width: 100%;
     height: auto;
-    /* Smooth transitions */
-    transition: opacity 0.3s ease;
+    /* Anti-aliasing for better image quality */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Fixed container sizes to prevent layout shift */
+  .relative {
+    /* Ensure consistent container sizing */
+    overflow: hidden;
+    /* Prevent content jumping */
+    contain: layout style;
   }
 }
