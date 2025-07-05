@@ -118,24 +118,24 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-4 sm:px-6">
         <div className="container mx-auto">
           <h2 className="text-4xl font-bold text-center mb-16">
             <span className="text-gradient-emerald-purple">The Ultimate Reference Tool</span>
           </h2>
           
-          {/* Central Feature Card */}
-          <div className={`mb-8 sm:mb-12 flex justify-center transition-opacity duration-500 ${allFeaturesReady ? 'opacity-100' : 'opacity-0'}`}>
-            <div className="glass-panel rounded-none sm:rounded-xl p-6 sm:p-6 md:p-8 border-0 sm:border border-slate-700/50 neon-glow-fusion overflow-hidden max-w-none sm:max-w-6xl w-full mx-0 sm:mx-6 md:mx-auto min-h-[60vh] sm:min-h-0 flex flex-col justify-center">
+          {/* Central Feature Card - Break Out Full Width */}
+          <div className={`mb-12 sm:mb-16 transition-opacity duration-500 ${allFeaturesReady ? 'opacity-100' : 'opacity-0'} -mx-4 sm:-mx-6`}>
+            <div className="glass-panel rounded-none sm:rounded-xl border-0 border-t border-b sm:border border-slate-700/50 neon-glow-fusion overflow-hidden w-full mx-0 sm:mx-4 md:mx-auto sm:max-w-6xl p-4 sm:p-6 md:p-8">
               
               {/* Main UI Screenshot */}
-              <div className="rounded-none sm:rounded-lg overflow-hidden border-0 sm:border border-slate-600/30 bg-slate-800/30 relative">
+              <div className="rounded-lg overflow-hidden border border-slate-600/30 bg-slate-800/30 relative">
                 {/* Loading skeleton */}
-                <div className={`w-full h-[50vh] sm:h-96 bg-slate-700/30 animate-pulse rounded-none sm:rounded-lg ${allFeaturesReady ? 'hidden' : 'block'}`} />
+                <div className={`w-full aspect-[16/9] bg-slate-700/30 animate-pulse rounded-lg ${allFeaturesReady ? 'hidden' : 'block'}`} />
                 <img 
                   src="/ui.png" 
                   alt="MixFade Complete Interface" 
-                  className={`w-full h-[50vh] sm:h-auto object-cover sm:object-contain transition-all duration-300 hover:scale-105 ${allFeaturesReady ? 'block' : 'hidden'}`}
+                  className={`w-full h-auto transition-all duration-300 hover:scale-105 ${allFeaturesReady ? 'block' : 'hidden'}`}
                   loading="eager"
                   decoding="sync"
                   style={{ imageRendering: 'auto' }}
