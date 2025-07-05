@@ -10,13 +10,13 @@ function findDocsPath() {
   console.log('__dirname:', __dirname);
   
   // Comprehensive list of possible locations for the docs folder
-  // Priority order: committed docs first, then fallback to source !docs
+  // Priority order: Railway common paths first, then local development paths
   const possiblePaths = [
-    path.join(process.cwd(), 'backend/docs'),   // PRIMARY: Railway deployment from root with backend/docs
-    '/app/backend/docs',                        // Railway absolute path for backend docs
+    '/app/docs',                                // PRIMARY: Railway absolute path (common location)
     path.join(__dirname, '../../docs'),          // Local development: backend/docs from src/routes
     path.join(process.cwd(), 'docs'),           // Railway: docs in working directory
-    '/app/docs',                                // Railway absolute path (common location)
+    path.join(process.cwd(), 'backend/docs'),   // Railway deployment from root with backend/docs
+    '/app/backend/docs',                        // Railway absolute path for backend docs
     // Fallback to source !docs (should only be used in development)
     path.join(__dirname, '../../../!docs'),      // Development: backend/src/routes -> project root
     path.join(__dirname, '../../!docs'),         // Production scenario 1: backend -> project root
