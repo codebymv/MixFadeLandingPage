@@ -5,7 +5,7 @@ export interface DocStructure {
   children?: DocStructure[];
 }
 
-// Real documentation structure from the !docs directory
+// Fallback documentation structure (used when backend is unavailable)
 export const docStructure: DocStructure[] = [
   {
     name: 'Getting Started',
@@ -16,6 +16,18 @@ export const docStructure: DocStructure[] = [
     name: 'Getting Started Github',
     path: 'getting-started-github',
     type: 'file'
+  },
+  {
+    name: 'Config',
+    path: 'Config',
+    type: 'folder',
+    children: [
+      {
+        name: 'Config Overview',
+        path: 'Config/config-overview',
+        type: 'file'
+      }
+    ]
   },
   {
     name: 'Stack',
@@ -170,6 +182,31 @@ export const docStructure: DocStructure[] = [
             type: 'file'
           }
         ]
+      },
+      {
+        name: 'AWS',
+        path: 'Implementations/AWS',
+        type: 'folder',
+        children: [
+          {
+            name: 'S3',
+            path: 'Implementations/AWS/S3',
+            type: 'folder',
+            children: []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    name: 'Security',
+    path: 'Security',
+    type: 'folder',
+    children: [
+      {
+        name: 'Security Overview',
+        path: 'Security/security-overview',
+        type: 'file'
       }
     ]
   },
@@ -344,14 +381,17 @@ Thank you for your patience as we continue to improve the documentation!
 
   private getFolderDescription(path: string, folderName: string): string {
     const descriptions: Record<string, string> = {
+      'Config': 'Configuration settings, environment variables, API endpoints, and deployment configurations for MixFade.',
       'Types': 'Understanding the type system and interfaces used throughout MixFade.',
       'Stack': 'Technical architecture and technology stack overview.',
+      'Security': 'Security guidelines, best practices, and implementation details.',
       'Implementations': 'Detailed implementation guides for MixFade features and components.',
       'Implementations/AudioTools': 'Audio processing and manipulation tools.',
       'Implementations/LocalStorage': 'Local storage and data persistence mechanisms.',
       'Implementations/PlaybackEngine': 'Audio playback and timeline control systems.',
       'Implementations/Sidebar': 'Sidebar navigation and panel management.',
       'Implementations/Waveforms': 'Waveform visualization and interaction features.',
+      'Implementations/AWS': 'Amazon Web Services integration and cloud storage solutions.',
       'Electron': 'Electron-specific implementation details and platform integration.',
       'Deploy': 'Application building, packaging, and distribution processes.',
       'Version': 'Version history, release notes, and changelog information.',
