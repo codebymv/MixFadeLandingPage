@@ -13,8 +13,8 @@ const findDocsPath = () => {
   
   // Try multiple possible locations for the docs folder
   const possiblePaths = [
-    path.join(__dirname, '../../../!docs'),  // Original path for other projects
-    path.join(__dirname, '../../docs'),      // Current project structure
+    path.join(__dirname, '../../docs'),      // Railway structure: /app/docs
+    path.join(__dirname, '../../../!docs'),  // Local development: project/!docs
     path.join(__dirname, '../../../docs')    // Alternative structure
   ];
 

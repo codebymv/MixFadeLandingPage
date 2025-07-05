@@ -5,7 +5,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 
 const DOCS_SOURCE = '!docs';
-const DOCS_TARGET = 'backend/docs';
+const DOCS_TARGET = process.env.RAILWAY_ENVIRONMENT ? 'docs' : 'backend/docs';
 
 /**
  * Cross-platform copy function
