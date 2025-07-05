@@ -14,28 +14,53 @@ async function copyDocs() {
   console.log('🔄 Syncing documentation...');
   console.log(`📁 Source: ${DOCS_SOURCE}`);
   console.log(`📁 Target: ${DOCS_TARGET}`);
+  console.log(`📁 Current working directory: ${process.cwd()}`);
+  console.log(`📁 __dirname: ${__dirname}`);
 
   try {
     // Check if source exists
+    console.log(`🔍 Checking if source exists: ${DOCS_SOURCE}`);
     await fs.access(DOCS_SOURCE);
+    console.log('✅ Source directory found');
+    
+    // List source contents for debugging
+    const sourceContents = await fs.readdir(DOCS_SOURCE);
+    console.log(`📋 Source contents: ${sourceContents.join(', ')}`);
     
     // Remove target if it exists
+    console.log(`🗑️ Removing existing target: ${DOCS_TARGET}`);
     try {
       await fs.rm(DOCS_TARGET, { recursive: true, force: true });
+      console.log('✅ Target directory removed');
     } catch (err) {
-      // Target doesn't exist, which is fine
+      console.log('ℹ️ Target directory did not exist');
     }
 
     // Create target directory
+    console.log(`📁 Creating target directory: ${DOCS_TARGET}`);
     await fs.mkdir(DOCS_TARGET, { recursive: true });
+    console.log('✅ Target directory created');
 
     // Copy recursively
+    console.log('📋 Starting recursive copy...');
     await copyRecursive(DOCS_SOURCE, DOCS_TARGET);
+    
+    // Verify the copy worked
+    const targetContents = await fs.readdir(DOCS_TARGET);
+    console.log(`📋 Target contents after copy: ${targetContents.join(', ')}`);
     
     console.log('✅ Documentation synced successfully!');
     return true;
   } catch (error) {
     console.error('❌ Error syncing documentation:', error.message);
+    console.error('❌ Error stack:', error.stack);
+    
+    // In Railway build environment, we want to fail the build if docs sync fails
+    if (process.env.RAILWAY_ENVIRONMENT || process.env.NODE_ENV === 'production') {
+      console.error('❌ CRITICAL: Documentation sync failed in production environment');
+      process.exit(1);
+    }
+    
     return false;
   }
 }
@@ -176,7 +201,11 @@ async function main() {
 
   switch (command) {
     case 'sync':
-      await copyDocs();
+      const syncResult = await copyDocs();
+      if (!syncResult) {
+        console.error('❌ Documentation sync failed');
+        process.exit(1);
+      }
       break;
     
     case 'watch':
@@ -184,7 +213,11 @@ async function main() {
       break;
     
     case 'check':
-      await checkSync();
+      const checkResult = await checkSync();
+      if (!checkResult) {
+        console.error('❌ Documentation check failed');
+        process.exit(1);
+      }
       break;
     
     default:
@@ -210,7 +243,10 @@ Description:
 }
 
 if (require.main === module) {
-  main().catch(console.error);
+  main().catch(error => {
+    console.error('❌ Unhandled error in main:', error);
+    process.exit(1);
+  });
 }
 
 module.exports = { copyDocs, watchDocs, checkSync };
