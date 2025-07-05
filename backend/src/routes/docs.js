@@ -5,53 +5,12 @@ const router = express.Router();
 
 // Function to find the docs folder in different deployment scenarios
 const findDocsPath = () => {
-  // Debug environment information
-  console.log(`[findDocsPath] DEBUG: __dirname = ${__dirname}`);
-  console.log(`[findDocsPath] DEBUG: process.cwd() = ${process.cwd()}`);
-  console.log(`[findDocsPath] DEBUG: NODE_ENV = ${process.env.NODE_ENV}`);
-  console.log(`[findDocsPath] DEBUG: RAILWAY_ENVIRONMENT = ${process.env.RAILWAY_ENVIRONMENT}`);
-  
   // Try multiple possible locations for the docs folder
   const possiblePaths = [
-    path.join(__dirname, '../../docs'),      // Railway structure: /app/docs
-    path.join(__dirname, '../../../!docs'),  // Local development: project/!docs
+    path.join(__dirname, '../../../!docs'),  // Original path for other projects
+    path.join(__dirname, '../../docs'),      // Current project structure
     path.join(__dirname, '../../../docs')    // Alternative structure
   ];
-
-  // Debug the constructed paths
-  console.log(`[findDocsPath] DEBUG: Constructed paths:`);
-  possiblePaths.forEach((p, i) => {
-    console.log(`[findDocsPath] DEBUG: Path ${i}: ${p}`);
-  });
-
-  // Try to list current directory and parent directories for debugging
-  try {
-    const currentDir = require('fs').readdirSync(__dirname);
-    console.log(`[findDocsPath] DEBUG: Current directory (${__dirname}) contents: ${currentDir.join(', ')}`);
-  } catch (e) {
-    console.log(`[findDocsPath] DEBUG: Could not list current directory: ${e.message}`);
-  }
-
-  try {
-    const parentDir = require('fs').readdirSync(path.join(__dirname, '..'));
-    console.log(`[findDocsPath] DEBUG: Parent directory contents: ${parentDir.join(', ')}`);
-  } catch (e) {
-    console.log(`[findDocsPath] DEBUG: Could not list parent directory: ${e.message}`);
-  }
-
-  try {
-    const grandParentDir = require('fs').readdirSync(path.join(__dirname, '../..'));
-    console.log(`[findDocsPath] DEBUG: Grandparent directory contents: ${grandParentDir.join(', ')}`);
-  } catch (e) {
-    console.log(`[findDocsPath] DEBUG: Could not list grandparent directory: ${e.message}`);
-  }
-
-  try {
-    const rootDir = require('fs').readdirSync(path.join(__dirname, '../../..'));
-    console.log(`[findDocsPath] DEBUG: Root directory contents: ${rootDir.join(', ')}`);
-  } catch (e) {
-    console.log(`[findDocsPath] DEBUG: Could not list root directory: ${e.message}`);
-  }
 
   for (const docsPath of possiblePaths) {
     console.log(`[findDocsPath] Attempting to use docs path: ${docsPath}`);

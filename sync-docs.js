@@ -5,7 +5,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 
 const DOCS_SOURCE = '!docs';
-const DOCS_TARGET = process.env.RAILWAY_ENVIRONMENT ? 'docs' : 'backend/docs';
+const DOCS_TARGET = 'backend/docs';
 
 /**
  * Cross-platform copy function
@@ -14,112 +14,27 @@ async function copyDocs() {
   console.log('🔄 Syncing documentation...');
   console.log(`📁 Source: ${DOCS_SOURCE}`);
   console.log(`📁 Target: ${DOCS_TARGET}`);
-  console.log(`📁 Current working directory: ${process.cwd()}`);
-  console.log(`📁 __dirname: ${__dirname}`);
-  console.log(`📁 NODE_ENV: ${process.env.NODE_ENV}`);
-  console.log(`📁 RAILWAY_ENVIRONMENT: ${process.env.RAILWAY_ENVIRONMENT}`);
-  console.log(`📁 Full DOCS_SOURCE path: ${path.resolve(DOCS_SOURCE)}`);
-  console.log(`📁 Full DOCS_TARGET path: ${path.resolve(DOCS_TARGET)}`);
-  
-  // List all files in current directory for debugging
-  try {
-    const currentDirContents = await fs.readdir('.');
-    console.log(`📋 Current directory contents: ${currentDirContents.join(', ')}`);
-  } catch (err) {
-    console.log(`❌ Could not read current directory: ${err.message}`);
-  }
-
   try {
     // Check if source exists
-    console.log(`🔍 Checking if source exists: ${DOCS_SOURCE}`);
-    
-    // Try to get detailed info about the source
-    try {
-      const sourceStat = await fs.stat(DOCS_SOURCE);
-      console.log(`✅ Source directory found - isDirectory: ${sourceStat.isDirectory()}`);
-      
-      // Also check absolute path
-      const absoluteSourcePath = path.resolve(DOCS_SOURCE);
-      console.log(`🔍 Absolute source path: ${absoluteSourcePath}`);
-      const absoluteSourceStat = await fs.stat(absoluteSourcePath);
-      console.log(`✅ Absolute source confirmed - isDirectory: ${absoluteSourceStat.isDirectory()}`);
-      
-    } catch (statError) {
-      console.log(`❌ Source stat failed: ${statError.message}`);
-      
-      // Try to list what's actually in the current directory
-      console.log('🔍 Attempting to find !docs or similar directories...');
-      const allItems = await fs.readdir('.', { withFileTypes: true });
-      const directories = allItems.filter(item => item.isDirectory()).map(item => item.name);
-      console.log(`📁 Available directories: ${directories.join(', ')}`);
-      
-      // Look for any docs-related directories
-      const docsLike = directories.filter(dir => dir.toLowerCase().includes('docs'));
-      console.log(`📚 Docs-like directories: ${docsLike.join(', ')}`);
-      
-      // Check if the absolute source path exists
-      const absoluteSourcePath = path.resolve(DOCS_SOURCE);
-      console.log(`🔍 Checking absolute source path: ${absoluteSourcePath}`);
-      try {
-        const absoluteSourceStat = await fs.stat(absoluteSourcePath);
-        console.log(`✅ Absolute source found - isDirectory: ${absoluteSourceStat.isDirectory()}`);
-      } catch (absSourceError) {
-        console.log(`❌ Absolute source also failed: ${absSourceError.message}`);
-      }
-      
-      throw statError;
-    }
-    
-    // List source contents for debugging
-    const sourceContents = await fs.readdir(DOCS_SOURCE);
-    console.log(`📋 Source contents: ${sourceContents.join(', ')}`);
+    await fs.access(DOCS_SOURCE);
     
     // Remove target if it exists
-    console.log(`🗑️ Removing existing target: ${DOCS_TARGET}`);
     try {
       await fs.rm(DOCS_TARGET, { recursive: true, force: true });
-      console.log('✅ Target directory removed');
     } catch (err) {
-      console.log('ℹ️ Target directory did not exist');
+      // Target doesn't exist, which is fine
     }
 
     // Create target directory
-    console.log(`📁 Creating target directory: ${DOCS_TARGET}`);
     await fs.mkdir(DOCS_TARGET, { recursive: true });
-    console.log('✅ Target directory created');
 
     // Copy recursively
-    console.log('📋 Starting recursive copy...');
     await copyRecursive(DOCS_SOURCE, DOCS_TARGET);
-    
-    // Verify the copy worked
-    const targetContents = await fs.readdir(DOCS_TARGET);
-    console.log(`📋 Target contents after copy: ${targetContents.join(', ')}`);
-    
-    // Extra verification: check if target directory actually exists at absolute path
-    const absoluteTargetPath = path.resolve(DOCS_TARGET);
-    console.log(`🔍 Verifying absolute target path exists: ${absoluteTargetPath}`);
-    try {
-      const absoluteStats = await fs.stat(absoluteTargetPath);
-      console.log(`✅ Absolute target confirmed - isDirectory: ${absoluteStats.isDirectory()}`);
-      const absoluteContents = await fs.readdir(absoluteTargetPath);
-      console.log(`📋 Absolute target contents: ${absoluteContents.join(', ')}`);
-    } catch (absError) {
-      console.error(`❌ Absolute target verification failed: ${absError.message}`);
-    }
     
     console.log('✅ Documentation synced successfully!');
     return true;
   } catch (error) {
     console.error('❌ Error syncing documentation:', error.message);
-    console.error('❌ Error stack:', error.stack);
-    
-    // In Railway build environment, we want to fail the build if docs sync fails
-    if (process.env.RAILWAY_ENVIRONMENT || process.env.NODE_ENV === 'production') {
-      console.error('❌ CRITICAL: Documentation sync failed in production environment');
-      process.exit(1);
-    }
-    
     return false;
   }
 }
