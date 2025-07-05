@@ -8,6 +8,7 @@
     "dev": "nodemon --dns-result-order=ipv4first src/index.js",
     "build": "echo 'No build step required'",
     "docs:sync": "node ../sync-docs.js sync",
+    "railway:build": "node ../sync-docs.js sync",
     "railway:start": "node --dns-result-order=ipv4first src/index.js"
   },
   "dependencies": {
