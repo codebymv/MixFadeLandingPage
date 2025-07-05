@@ -1,383 +1,297 @@
 const express = require('express');
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 const router = express.Router();
 
-// Function to find the docs directory with comprehensive fallback strategy
-function findDocsPath() {
-  console.log('Starting docs folder search...');
-  console.log('Current working directory:', process.cwd());
-  console.log('__dirname:', __dirname);
-  
-  // Comprehensive list of possible locations for the docs folder
-  // Priority order: Railway common paths first, then local development paths
+// Function to find the docs folder in different deployment scenarios
+const findDocsPath = () => {
+  // Try multiple possible locations for the docs folder
   const possiblePaths = [
-    '/app/docs',                                // PRIMARY: Railway absolute path (common location)
-    path.join(__dirname, '../../docs'),          // Local development: backend/docs from src/routes
-    path.join(process.cwd(), 'docs'),           // Railway: docs in working directory
-    path.join(process.cwd(), 'backend/docs'),   // Railway deployment from root with backend/docs
-    '/app/backend/docs',                        // Railway absolute path for backend docs
-    // Fallback to source !docs (should only be used in development)
-    path.join(__dirname, '../../../!docs'),      // Development: backend/src/routes -> project root
-    path.join(__dirname, '../../!docs'),         // Production scenario 1: backend -> project root
-    path.join(__dirname, '../!docs'),            // Production scenario 2: src -> project root
-    path.join(__dirname, '../../../../!docs'),   // Production scenario 3: deeper nesting
-    path.join(process.cwd(), '!docs'),          // Railway: original docs in working directory
-    path.join(process.cwd(), '../!docs'),       // One level up from working directory
-    '/app/!docs',                               // Railway absolute path (original folder)
+    path.join(__dirname, '../../../!docs'),  // Original path for other projects
+    path.join(__dirname, '../../docs'),      // Current project structure
+    path.join(__dirname, '../../../docs')    // Alternative structure
   ];
 
-  console.log('Checking paths:', possiblePaths);
-
-  // Try each path and return the first one that exists
   for (const docsPath of possiblePaths) {
+    console.log(`[findDocsPath] Attempting to use docs path: ${docsPath}`);
     try {
-      console.log(`Checking path: ${docsPath}`);
-      // Check if the path exists and is a directory
-      const stats = fs.statSync(docsPath);
+      const stats = require('fs').statSync(docsPath);
       if (stats.isDirectory()) {
-        console.log(`✅ Found docs folder at: ${docsPath}`);
+        console.log(`[findDocsPath] ✅ Found docs folder at: ${docsPath}`);
         // List contents to verify
         try {
-          const contents = fs.readdirSync(docsPath);
-          console.log(`Contents: ${contents.join(', ')}`);
+          const contents = require('fs').readdirSync(docsPath);
+          console.log(`[findDocsPath] Contents: ${contents.join(', ')}`);
         } catch (e) {
-          console.log('Could not list contents');
+          console.log(`[findDocsPath] Could not list contents of ${docsPath}: ${e.message}`);
         }
         return docsPath;
       }
     } catch (error) {
-      console.log(`❌ Path not found: ${docsPath} - ${error.message}`);
-      // Path doesn't exist, try next one
-      continue;
+      console.log(`[findDocsPath] Path not found: ${docsPath} - ${error.message}`);
     }
   }
 
-  // If no docs folder found, log error and use default
-  console.error('!docs folder not found in any expected location. Tried:', possiblePaths);
-  return path.join(__dirname, '../../../!docs'); // fallback to original path
-}
+  console.error('[findDocsPath] No docs folder found at any expected location.');
+  return possiblePaths[0]; // Return the first path as fallback
+};
 
-// Get document content
+// Base path to the docs folder
+const DOCS_BASE_PATH = findDocsPath();
+console.log(`[DOCS_INIT] Final docs base path: ${DOCS_BASE_PATH}`);
+
+/**
+ * Get markdown content for a specific document path
+ * GET /api/docs/content?path=getting-started
+ * GET /api/docs/content?path=API/api-overview
+ */
 router.get('/content', async (req, res) => {
+  console.log('[GET /api/docs/content] Route handler entered.');
   try {
     const { path: docPath } = req.query;
+    console.log(`[GET /api/docs/content] Received request for docPath: ${docPath}`);
     
     if (!docPath) {
-      return res.status(400).json({ error: 'Path parameter is required' });
-    }
-
-    const docsDir = findDocsPath();
-    if (!docsDir) {
-      return res.status(404).json({ 
-        error: 'Documentation directory not found',
-        content: getFallbackDocContent(docPath)
+      console.log('[GET /api/docs/content] Path parameter is missing.');
+      return res.status(400).json({
+        error: 'Path parameter is required'
       });
     }
 
     // Construct the full file path
     const fileName = docPath.endsWith('.md') ? docPath : `${docPath}.md`;
-    const fullPath = path.join(docsDir, fileName);
+    const fullPath = path.join(DOCS_BASE_PATH, fileName);
+    console.log(`[GET /api/docs/content] Attempting to read file from fullPath: ${fullPath}`);
 
     // Security check: ensure the path is within the docs directory
     const resolvedPath = path.resolve(fullPath);
-    const resolvedDocsPath = path.resolve(docsDir);
+    const resolvedDocsPath = path.resolve(DOCS_BASE_PATH);
     
+    console.log(`[GET /api/docs/content] Resolved file path: ${resolvedPath}`);
+    console.log(`[GET /api/docs/content] Resolved docs base path: ${resolvedDocsPath}`);
+
     if (!resolvedPath.startsWith(resolvedDocsPath)) {
+      console.warn(`[GET /api/docs/content] Access denied: Path ${resolvedPath} is outside docs directory ${resolvedDocsPath}`);
       return res.status(403).json({
         error: 'Access denied: Path outside docs directory'
       });
     }
 
     try {
-      const content = fs.readFileSync(resolvedPath, 'utf8');
-      const stats = fs.statSync(resolvedPath);
-    
+      const content = await fs.readFile(resolvedPath, 'utf-8');
+      const stats = await fs.stat(resolvedPath);
+      console.log(`[GET /api/docs/content] Successfully read file: ${resolvedPath}`);
+      
       res.json({
         content,
         path: docPath,
         lastModified: stats.mtime.toISOString(),
         size: stats.size
       });
+      console.log('[GET /api/docs/content] Response sent successfully.');
     } catch (fileError) {
+      console.error(`[GET /api/docs/content] Error during file operation:`, fileError);
       if (fileError.code === 'ENOENT') {
-        // File not found, try fallback content
-        const fallbackContent = getFallbackDocContent(docPath);
-        if (fallbackContent) {
-          res.json({
-            content: fallbackContent,
-            path: docPath,
-            lastModified: new Date().toISOString(),
-            size: fallbackContent.length,
-            source: 'fallback'
-          });
-        } else {
-          res.status(404).json({
-            error: 'Document not found',
-            path: docPath
-          });
-        }
+        console.warn(`[GET /api/docs/content] File not found: ${resolvedPath}`);
+        res.status(404).json({
+          error: 'Document not found',
+          path: docPath
+        });
       } else {
-        throw fileError;
+        console.error(`[GET /api/docs/content] Unhandled file error:`, fileError);
+        res.status(500).json({
+          error: 'Internal server error',
+          message: 'Failed to read document due to unexpected file error'
+        });
       }
     }
   } catch (error) {
-    console.error('Error reading document:', error);
-    res.status(500).json({ 
-      error: 'Failed to read document',
-      content: getFallbackDocContent(req.query.path || 'unknown')
+    console.error('[GET /api/docs/content] General error in content endpoint:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Failed to read document due to general error'
     });
   }
 });
 
-// Get documentation structure
+/**
+ * Get the structure of the documentation directory
+ * GET /api/docs/structure
+ */
 router.get('/structure', async (req, res) => {
   try {
-    const docsDir = findDocsPath();
-    if (!docsDir) {
-      return res.json(getDefaultDocStructure());
-    }
-
-    const structure = await buildDocStructure(docsDir);
+    const structure = await buildDocStructure(DOCS_BASE_PATH);
     res.json(structure);
   } catch (error) {
     console.error('Error building doc structure:', error);
-    res.status(500).json({ 
-      error: 'Failed to build documentation structure',
-      structure: getDefaultDocStructure()
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Failed to build documentation structure'
     });
   }
 });
 
-// Search documents
+/**
+ * Search documentation files
+ * GET /api/docs/search?q=API
+ */
 router.get('/search', async (req, res) => {
   try {
     const { q: query } = req.query;
     
     if (!query || query.trim().length === 0) {
-      return res.json([]);
+      return res.status(400).json({
+        error: 'Query parameter is required'
+      });
     }
 
-    const docsDir = findDocsPath();
-    if (!docsDir) {
-      return res.json([]);
-    }
-
-    const results = await searchDocuments(docsDir, query.toLowerCase());
-    res.json(results);
+    const searchResults = await searchDocuments(DOCS_BASE_PATH, query.trim());
+    res.json(searchResults);
   } catch (error) {
     console.error('Error searching documents:', error);
-    res.status(500).json({ error: 'Search failed' });
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Failed to search documents'
+    });
   }
 });
 
-// Helper function to build documentation structure
-async function buildDocStructure(docsDir, relativePath = '') {
+/**
+ * Recursively build the documentation directory structure
+ */
+async function buildDocStructure(dirPath, relativePath = '') {
+  console.log(`[buildDocStructure] Called for dirPath: ${dirPath}, relativePath: ${relativePath}`);
   const items = [];
-  const fullPath = path.join(docsDir, relativePath);
   
   try {
-    if (!fs.existsSync(fullPath)) {
-      return items;
-    }
-
-    const entries = fs.readdirSync(fullPath, { withFileTypes: true });
-  
-  // Sort: directories first, then files, both alphabetically
-  entries.sort((a, b) => {
-    if (a.isDirectory() && !b.isDirectory()) return -1;
-    if (!a.isDirectory() && b.isDirectory()) return 1;
-    return a.name.localeCompare(b.name);
-  });
-
-  for (const entry of entries) {
-    if (entry.name.startsWith('.')) continue;
+    const entries = await fs.readdir(dirPath, { withFileTypes: true });
+    console.log(`[buildDocStructure] Found entries in ${dirPath}: ${entries.map(e => e.name).join(', ')}`);
     
-    const itemPath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
-    
-    if (entry.isDirectory()) {
-      const children = await buildDocStructure(docsDir, itemPath);
-      items.push({
-        name: formatName(entry.name),
-        path: itemPath,
-        type: 'folder',
-        children
-      });
-    } else if (entry.name.endsWith('.md')) {
-      const nameWithoutExt = entry.name.replace('.md', '');
-      items.push({
-        name: formatName(nameWithoutExt),
-        path: itemPath.replace('.md', ''),
-        type: 'file'
-      });
+    for (const entry of entries) {
+      const entryPath = path.join(dirPath, entry.name);
+      const relativeEntryPath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+      
+      if (entry.isDirectory()) {
+        console.log(`[buildDocStructure] Processing directory: ${entry.name}`);
+        const children = await buildDocStructure(entryPath, relativeEntryPath);
+        items.push({
+          name: formatName(entry.name),
+          path: relativeEntryPath,
+          type: 'folder',
+          children
+        });
+      } else if (entry.isFile() && entry.name.endsWith('.md')) {
+        console.log(`[buildDocStructure] Processing markdown file: ${entry.name}`);
+        const nameWithoutExt = entry.name.replace('.md', '');
+        const pathWithoutExt = relativeEntryPath.replace('.md', '');
+        
+        items.push({
+          name: formatName(nameWithoutExt),
+          path: pathWithoutExt,
+          type: 'file'
+        });
+      }
     }
-  }
-
-  return items;
-  } catch (error) {
-    console.error(`Error reading directory ${fullPath}:`, error);
+    
+    // Sort items: folders first, then files, both alphabetically
+    items.sort((a, b) => {
+      if (a.type !== b.type) {
+        return a.type === 'folder' ? -1 : 1;
+      }
+      return a.name.localeCompare(b.name);
+    });
+    
     return items;
+  } catch (error) {
+    console.error(`[buildDocStructure] Error reading directory ${dirPath}:`, error);
+    return [];
   }
 }
 
-// Helper function to search documents
-async function searchDocuments(docsDir, query, relativePath = '', results = []) {
-  const fullPath = path.join(docsDir, relativePath);
-  
+/**
+ * Search for documents containing the query text
+ */
+async function searchDocuments(dirPath, query, relativePath = '', results = []) {
   try {
-    if (!fs.existsSync(fullPath)) {
-      return results;
-    }
-
-    const entries = fs.readdirSync(fullPath, { withFileTypes: true });
-  
-  for (const entry of entries) {
-    if (entry.name.startsWith('.')) continue;
+    const entries = await fs.readdir(dirPath, { withFileTypes: true });
     
-    const itemPath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
-    
-    if (entry.isDirectory()) {
-      await searchDocuments(docsDir, query, itemPath, results);
-    } else if (entry.name.endsWith('.md')) {
-      const nameWithoutExt = entry.name.replace('.md', '');
-      const docPath = itemPath.replace('.md', '');
+    for (const entry of entries) {
+      const entryPath = path.join(dirPath, entry.name);
+      const relativeEntryPath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
       
-      // Check if filename matches
-      if (nameWithoutExt.toLowerCase().includes(query)) {
-        results.push({
-          name: formatName(nameWithoutExt),
-          path: docPath,
-          type: 'file',
-          excerpt: `Document: ${formatName(nameWithoutExt)}`
-        });
-        continue;
-      }
-      
-      // Check if content matches
-      try {
-        const content = fs.readFileSync(path.join(docsDir, itemPath), 'utf8');
-        if (content.toLowerCase().includes(query)) {
-          results.push({
-            name: formatName(nameWithoutExt),
-            path: docPath,
-            type: 'file',
-            excerpt: extractExcerpt(content, query)
-          });
+      if (entry.isDirectory()) {
+        await searchDocuments(entryPath, query, relativeEntryPath, results);
+      } else if (entry.isFile() && entry.name.endsWith('.md')) {
+        try {
+          const content = await fs.readFile(entryPath, 'utf-8');
+          const nameWithoutExt = entry.name.replace('.md', '');
+          const pathWithoutExt = relativeEntryPath.replace('.md', '');
+          
+          // Search in filename and content
+          const nameMatch = nameWithoutExt.toLowerCase().includes(query.toLowerCase());
+          const contentMatch = content.toLowerCase().includes(query.toLowerCase());
+          
+          if (nameMatch || contentMatch) {
+            results.push({
+              name: formatName(nameWithoutExt),
+              path: pathWithoutExt,
+              type: 'file',
+              excerpt: contentMatch ? extractExcerpt(content, query) : null
+            });
+          }
+        } catch (readError) {
+          console.error(`Error reading file ${entryPath}:`, readError);
         }
-      } catch (error) {
-        console.error(`Error reading file ${itemPath}:`, error);
       }
     }
-  }
-
-  return results;
+    
+    return results;
   } catch (error) {
-    console.error(`Error searching directory ${fullPath}:`, error);
+    console.error(`Error searching directory ${dirPath}:`, error);
     return results;
   }
 }
 
-// Helper function to extract excerpt around search query
-function extractExcerpt(content, query) {
-  const index = content.toLowerCase().indexOf(query.toLowerCase());
-  if (index === -1) return '';
+/**
+ * Extract a text excerpt around the search query
+ */
+function extractExcerpt(content, query, contextLength = 100) {
+  const lowerContent = content.toLowerCase();
+  const lowerQuery = query.toLowerCase();
+  const index = lowerContent.indexOf(lowerQuery);
   
-  const start = Math.max(0, index - 50);
-  const end = Math.min(content.length, index + query.length + 50);
+  if (index === -1) return null;
+  
+  const start = Math.max(0, index - contextLength);
+  const end = Math.min(content.length, index + query.length + contextLength);
+  
   let excerpt = content.substring(start, end);
   
+  // Add ellipsis if we truncated
   if (start > 0) excerpt = '...' + excerpt;
   if (end < content.length) excerpt = excerpt + '...';
   
   return excerpt;
 }
 
-// Helper function to format names
+/**
+ * Format file/directory names for display
+ */
 function formatName(name) {
   return name
-    .replace(/[-_]/g, ' ')
+    .replace(/-/g, ' ')
     .replace(/\b\w/g, l => l.toUpperCase());
 }
 
-// Fallback content for missing documents
+/**
+ * Get fallback content for critical documents when files aren't available
+ */
 function getFallbackDocContent(docPath) {
-  if (docPath === 'getting-started') {
-    return `# Getting Started with MixFade
+  const fallbackDocs = {
+    'getting-started': '# Documentation Not Found\n\nWe could not find the requested documentation. Please check the URL or try again later.'
+  };
 
-Welcome to MixFade, the ultimate audio mixing and DJ application!
-
-## Quick Start
-
-1. **Download**: Get the latest version from our website
-2. **Install**: Run the installer and follow the setup wizard
-3. **Launch**: Open MixFade and start mixing!
-
-## Key Features
-
-- **Professional Audio Tools**: Advanced mixing capabilities
-- **Real-time Visualization**: Waveforms, spectrograms, and more
-- **Cross-platform**: Available on Windows, macOS, and Linux
-- **Intuitive Interface**: Easy to learn, powerful to master
-
-## Getting Help
-
-- Check out our documentation sections
-- Submit bug reports through our feedback system
-- Join our community for tips and tricks
-
-Happy mixing! 🎵`;
-  }
-  
-  return `# ${formatName(docPath)}
-
-This documentation section is coming soon.
-
-In the meantime, you can:
-- Explore other sections in the sidebar
-- Submit feedback through the bug report form
-- Check back later for updates
-
-Thank you for your patience as we continue to improve the documentation!`;
-}
-
-// Default documentation structure
-function getDefaultDocStructure() {
-  return [
-    {
-      name: 'Getting Started',
-      path: 'getting-started',
-      type: 'file'
-    },
-    {
-      name: 'Getting Started Github',
-      path: 'getting-started-github',
-      type: 'file'
-    },
-    {
-      name: 'Stack',
-      path: 'Stack',
-      type: 'folder',
-      children: [
-        {
-          name: 'Stack Overview',
-          path: 'Stack/stack-overview',
-          type: 'file'
-        }
-      ]
-    },
-    {
-      name: 'Types',
-      path: 'Types',
-      type: 'folder',
-      children: [
-        {
-          name: 'Component Interfaces',
-          path: 'Types/component-interfaces',
-          type: 'file'
-        }
-      ]
-    }
-  ];
+  return fallbackDocs[docPath] || null;
 }
 
 module.exports = router;
