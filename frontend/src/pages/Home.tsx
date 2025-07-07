@@ -115,7 +115,7 @@ const Home = () => {
           
           {/* Central Feature Card */}
           <div className={`mb-8 sm:mb-12 flex justify-center transition-opacity duration-500 ${allFeaturesReady ? 'opacity-100' : 'opacity-0'}`}>
-            <div className="glass-panel rounded-none sm:rounded-xl p-6 sm:p-6 md:p-8 border-0 sm:border border-slate-700/50 neon-glow-fusion overflow-hidden max-w-none sm:max-w-6xl w-full mx-0 sm:mx-6 md:mx-auto min-h-[60vh] sm:min-h-0 flex flex-col justify-center">
+            <div className="glass-panel -mx-6 sm:mx-6 md:mx-auto rounded-none sm:rounded-xl p-6 sm:p-6 md:p-8 border-0 sm:border border-slate-700/50 neon-glow-fusion overflow-hidden max-w-none sm:max-w-6xl w-[calc(100%+48px)] sm:w-full min-h-[60vh] sm:min-h-0 flex flex-col justify-center">
               
               {/* Main UI Screenshot */}
               <div className="rounded-none sm:rounded-lg overflow-hidden border-0 sm:border border-slate-600/30 bg-slate-800/30 relative">
