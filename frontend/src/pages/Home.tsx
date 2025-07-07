@@ -42,53 +42,35 @@ const Home = () => {
         
         <div className="container mx-auto text-center relative z-10">
           <div className="mb-8">
-            {/* Logo Section with MixFade and OpaqueSound logos */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 mb-6">
-              {/* Logo Container with Loading State - Simplified animation structure */}
-              <div className="relative">
-                <div 
-                  className={`absolute inset-0 transition-opacity duration-700 ${allLogosReady ? 'opacity-0' : 'opacity-100'}`}
-                >
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6">
-                    <div className="w-80 h-20 rounded-lg logo-skeleton" />
-                    <span className="text-slate-400 text-lg sm:text-xl font-medium opacity-50">by</span>
-                    <div className="w-64 h-16 rounded-lg logo-skeleton" />
-                  </div>
-                </div>
-                
-                <div 
-                  className={`transition-opacity duration-700 ${allLogosReady ? 'opacity-100 transform-gpu' : 'opacity-0'}`}
-                  style={{ willChange: 'opacity' }}
-                >
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6">
-                    {/* MixFade Logo */}
-                    <div className="relative">
-                      <img 
-                        src="/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.png" 
-                        alt="MixFade Logo" 
-                        className="w-80 sm:w-80 h-auto opacity-90"
-                        loading="eager"
-                        decoding="sync"
-                      />
-                    </div>
-                    
-                    {/* "by" text - separate row on mobile, inline on desktop */}
-                    <span className="text-slate-400 text-lg sm:text-xl font-medium">by</span>
-                    
-                    {/* OpaqueSound Logo */}
-                    <div className="relative">
-                      <Link to="https://opaquesound.com">
-                        <img 
-                          src="/OS_Full_Logo_transparent.png" 
-                          alt="OpaqueSound Logo" 
-                          className="w-64 sm:w-64 h-auto opacity-90"
-                          loading="eager"
-                          decoding="sync"
-                        />
-                      </Link>
-                    </div>
-                  </div>
-                </div>
+            {/* Logo Section */}
+            <div className="inline-flex flex-col sm:flex-row items-center gap-2 sm:gap-6 mb-6">
+              {/* MixFade Logo */}
+              <div className={`transition-opacity duration-700 ${allLogosReady ? 'opacity-100' : 'opacity-0'}`}>
+                <img 
+                  src="/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.png" 
+                  alt="MixFade Logo" 
+                  className="w-80 h-20 object-contain"
+                  loading="eager"
+                  decoding="sync"
+                />
+              </div>
+              
+              {/* "by" text */}
+              <span className={`text-slate-400 text-lg sm:text-xl font-medium transition-opacity duration-700 ${allLogosReady ? 'opacity-100' : 'opacity-50'}`}>
+                by
+              </span>
+              
+              {/* OpaqueSound Logo */}
+              <div className={`transition-opacity duration-700 ${allLogosReady ? 'opacity-100' : 'opacity-0'}`}>
+                <Link to="https://opaquesound.com">
+                  <img 
+                    src="/OS_Full_Logo_transparent.png" 
+                    alt="OpaqueSound Logo" 
+                    className="w-64 h-16 object-contain"
+                    loading="eager"
+                    decoding="sync"
+                  />
+                </Link>
               </div>
             </div>
           </div>
