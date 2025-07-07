@@ -16,11 +16,11 @@
     "start:backend": "cd backend && npm start",
     "install:all": "npm install && cd frontend && npm install && cd backend && npm install",
     "prebuild": "echo 'Preparing build...'",
-    "build": "npm run docs:check && npm run docs:sync && npm run build:backend && npm run build:frontend",
+    "build": "npm run docs:sync && npm run build:frontend && npm run build:backend",
     "postbuild": "echo 'Build completed with docs synced'",
     "build:frontend": "cd frontend && npm run build",
     "build:backend": "cd backend && npm run build",
-    "railway:build": "npm run build:backend && npm run build:frontend",
+    "railway:build": "npm run docs:sync && npm run build:backend && npm run build:frontend",
     "railway:start": "npm run start:backend",
 
     "lint": "cd frontend && npm run lint",

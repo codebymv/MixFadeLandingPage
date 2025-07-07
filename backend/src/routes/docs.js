@@ -3,38 +3,13 @@ const fs = require('fs').promises;
 const path = require('path');
 const router = express.Router();
 
-// Function to find the docs folder in different deployment scenarios
-const findDocsPath = () => {
-  // Try multiple possible locations for the docs folder
-  const possiblePaths = [
-    path.join(__dirname, '../../../!docs'),  // Original path for other projects
-    path.join(__dirname, '../../docs'),      // Current project structure
-    path.join(__dirname, '../../../docs')    // Alternative structure
-  ];
-
-  for (const docsPath of possiblePaths) {
-    console.log(`[findDocsPath] Attempting to use docs path: ${docsPath}`);
-    try {
-      const stats = require('fs').statSync(docsPath);
-      if (stats.isDirectory()) {
-        console.log(`[findDocsPath] ✅ Found docs folder at: ${docsPath}`);
-        // List contents to verify
-        try {
-          const contents = require('fs').readdirSync(docsPath);
-          console.log(`[findDocsPath] Contents: ${contents.join(', ')}`);
-        } catch (e) {
-          console.log(`[findDocsPath] Could not list contents of ${docsPath}: ${e.message}`);
-        }
-        return docsPath;
-      }
-    } catch (error) {
-      console.log(`[findDocsPath] Path not found: ${docsPath} - ${error.message}`);
-    }
-  }
-
-  console.error('[findDocsPath] No docs folder found at any expected location.');
-  return possiblePaths[0]; // Return the first path as fallback
-};
+function findDocsPath() {
+  // Use backend/docs since documentation is synced there before deployment
+  // __dirname is /app/backend/src/routes, so we need ../../../backend/docs to get to /app/backend/docs
+  const docsPath = path.join(__dirname, '../../../backend/docs');
+  console.log(`📚 Using docs path: ${docsPath}`);
+  return docsPath;
+}
 
 // Base path to the docs folder
 const DOCS_BASE_PATH = findDocsPath();

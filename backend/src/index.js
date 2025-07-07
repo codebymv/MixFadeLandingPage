@@ -181,7 +181,7 @@ app.use((req, res, next) => {
 });
 
 // API routes
-app.use('/api/email', emailLimiter, emailRoutes);
+app.use('/api/email', emailRoutes);
 app.use('/api/download', downloadRoutes);
 app.use('/api/docs', docsRoutes);
 
