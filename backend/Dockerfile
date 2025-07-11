@@ -1,11 +1,6 @@
 FROM node:18-alpine
 
-# Create app directory
 WORKDIR /app
-
-# Add non-root user for security
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nodejs -u 1001
 
 # Copy package files
 COPY package*.json ./
@@ -17,15 +12,16 @@ RUN npm install --production
 COPY src/ ./src/
 COPY docs/ ./docs/
 
-# Change ownership to nodejs user
-RUN chown -R nodejs:nodejs /app
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nodejs -u 1001
 
-# Switch to non-root user
+# Change ownership of the app directory
+RUN chown -R nodejs:nodejs /app
 USER nodejs
 
-# Health check (use PORT env var or default to 3001)
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "const port = process.env.PORT || 3001; require('http').get('http://localhost:' + port + '/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+# Expose port
+EXPOSE 3001
 
 # Start the application
 CMD ["npm", "start"]
