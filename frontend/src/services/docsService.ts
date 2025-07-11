@@ -239,7 +239,7 @@ export const docStructure: DocStructure[] = [
 export const fetchDocContent = async (path: string): Promise<string> => {
   try {
     // Use backend API to fetch document content
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    const apiUrl = import.meta.env.VITE_API_URL || 'https://mixfade-frontend-production.up.railway.app';
     const response = await fetch(`${apiUrl}/api/docs/content?path=${encodeURIComponent(path)}`);
     
     if (!response.ok) {
@@ -264,7 +264,7 @@ class DocsService {
   async getDocStructure(): Promise<DocStructure[]> {
     try {
       // Use backend API to fetch document structure
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://mixfade-frontend-production.up.railway.app';
       const response = await fetch(`${apiUrl}/api/docs/structure`);
       
       if (!response.ok) {
@@ -287,7 +287,7 @@ class DocsService {
       }
       
       // Use backend API to search documents
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://mixfade-frontend-production.up.railway.app';
       const response = await fetch(`${apiUrl}/api/docs/search?q=${encodeURIComponent(query)}`);
       
       if (!response.ok) {
