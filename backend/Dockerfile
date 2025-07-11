@@ -10,7 +10,7 @@ RUN npm install --production
 
 # Copy source code and docs
 COPY src/ ./src/
-COPY docs/ ./docs/
+COPY docs/ /backend/docs/
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs
