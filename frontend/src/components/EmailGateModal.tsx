@@ -18,25 +18,23 @@ interface FormData {
   email: string;
 }
 
-const EmailGateModal = ({ 
-  isOpen, 
-  onClose, 
-  onSuccess, 
-  platform = 'windows', 
-  version = '0.9.4' 
+const EmailGateModal = ({
+  isOpen,
+  onClose,
+  onSuccess,
+  platform = 'windows',
+  version = '0.9.4'
 }: EmailGateModalProps) => {
   const [formData, setFormData] = useState<FormData>({ email: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>('');
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Email validation
   const isValidEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email.trim());
   };
 
-  // API call to collect email using the service
   const handleEmailCollection = async (email: string): Promise<EmailCollectionResponse> => {
     return collectEmail({
       email,
@@ -49,41 +47,21 @@ const EmailGateModal = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     const email = formData.email.trim();
-    
-    // Reset states
     setError('');
-    
-    // Validation
-    if (!email) {
-      setError('Email address is required');
-      return;
-    }
-    
-    if (!isValidEmail(email)) {
-      setError('Please enter a valid email address');
-      return;
-    }
+
+    if (!email) { setError('Email address is required'); return; }
+    if (!isValidEmail(email)) { setError('Please enter a valid email address'); return; }
 
     setIsSubmitting(true);
-
     try {
       const result = await handleEmailCollection(email);
-      
       if (result.success) {
         setIsSuccess(true);
-        
-        // Show success message briefly before triggering download
         setTimeout(() => {
           onSuccess(result.sessionId);
           onClose();
-          
-          // Reset modal state after closing
-          setTimeout(() => {
-            setIsSuccess(false);
-            setFormData({ email: '' });
-          }, 300);
+          setTimeout(() => { setIsSuccess(false); setFormData({ email: '' }); }, 300);
         }, 1500);
       } else {
         setError(result.error || 'Failed to process email. Please try again.');
@@ -98,48 +76,40 @@ const EmailGateModal = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ email: e.target.value });
-    // Clear error when user starts typing
     if (error) setError('');
   };
 
   const handleClose = () => {
     if (!isSubmitting) {
       onClose();
-      // Reset form after modal closes
-      setTimeout(() => {
-        setFormData({ email: '' });
-        setError('');
-        setIsSuccess(false);
-      }, 300);
+      setTimeout(() => { setFormData({ email: '' }); setError(''); setIsSuccess(false); }, 300);
     }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="glass-panel border border-slate-700/50 neon-glow-fusion max-w-md mx-auto bg-slate-900/95 backdrop-blur-xl">
+      <DialogContent className="glass-panel border border-slate-700/30 neon-glow-fusion max-w-md mx-auto bg-slate-900/95 backdrop-blur-2xl">
         <DialogHeader className="text-center">
-          <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-r from-emerald-500/20 to-purple-500/20 rounded-full flex items-center justify-center">
+          <div className="mx-auto mb-4 w-14 h-14 bg-gradient-to-br from-emerald-500/15 to-purple-500/15 rounded-2xl flex items-center justify-center">
             {isSuccess ? (
-              <CheckCircle className="w-8 h-8 text-emerald-400" />
+              <CheckCircle className="w-7 h-7 text-emerald-400" />
             ) : (
-              <img 
-                src="/OS_Initials_Icon_transparent.png" 
-                alt="OpaqueSound" 
-                className="w-10 h-10 object-contain"
+              <img
+                src="/OS_Initials_Icon_transparent.png"
+                alt="OpaqueSound"
+                className="w-8 h-8 object-contain"
               />
             )}
           </div>
-          
-          <DialogTitle className="text-2xl font-bold text-white">
+
+          <DialogTitle className="font-display text-2xl font-bold text-white">
             {isSuccess ? 'Success!' : (
-              <>
-                Get Your <span className="text-gradient-emerald-purple">Free Download</span>
-              </>
+              <>Get Your <span className="text-gradient-emerald-purple">Free Download</span></>
             )}
           </DialogTitle>
-          
-          <DialogDescription className="text-slate-300 mt-2">
-            {isSuccess 
+
+          <DialogDescription className="text-slate-400 mt-2 text-sm">
+            {isSuccess
               ? 'Your download will start shortly...'
               : `Enter your email to download MixFade v${version} for ${platform.charAt(0).toUpperCase() + platform.slice(1)}`
             }
@@ -147,7 +117,6 @@ const EmailGateModal = ({
         </DialogHeader>
 
         {isSuccess ? (
-          // Success State
           <div className="text-center py-6">
             <div className="mb-4">
               <div className="inline-flex items-center space-x-2 text-emerald-400 text-lg font-medium">
@@ -155,33 +124,28 @@ const EmailGateModal = ({
                 <span>Thank you!</span>
               </div>
             </div>
-            <p className="text-slate-300 mb-4">
-              Your download will begin automatically.
-            </p>
+            <p className="text-slate-400 mb-4 text-sm">Your download will begin automatically.</p>
             <div className="flex items-center justify-center space-x-2 text-emerald-400">
               <Download className="w-4 h-4" />
               <span className="text-sm">Preparing download...</span>
             </div>
           </div>
         ) : (
-          // Form State
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-white font-medium">
-                Email Address
-              </Label>
+              <Label htmlFor="email" className="text-white font-medium text-sm">Email Address</Label>
               <Input
                 id="email"
                 type="email"
                 value={formData.email}
                 onChange={handleInputChange}
                 placeholder="your@email.com"
-                className="bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all"
+                className="bg-slate-800/40 border-slate-700/50 text-white placeholder:text-slate-500 focus:border-emerald-500/50 transition-all"
                 disabled={isSubmitting}
                 autoComplete="email"
                 autoFocus
               />
-              
+
               {error && (
                 <div className="flex items-center space-x-2 text-red-400 text-sm">
                   <AlertCircle className="w-4 h-4" />
@@ -191,19 +155,19 @@ const EmailGateModal = ({
             </div>
 
             {/* Benefits */}
-            <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-600/30">
-              <h4 className="text-white font-medium mb-2 text-sm">What you'll get:</h4>
-              <ul className="space-y-1 text-slate-300 text-sm">
+            <div className="bg-slate-800/20 rounded-lg p-4 border border-slate-700/20">
+              <h4 className="text-white font-medium mb-2 text-xs tracking-wider uppercase">What you'll get</h4>
+              <ul className="space-y-1.5 text-slate-400 text-sm">
                 <li className="flex items-center space-x-2">
-                  <span className="text-emerald-400">•</span>
+                  <span className="text-emerald-500/60">›</span>
                   <span>Instant download access</span>
                 </li>
                 <li className="flex items-center space-x-2">
-                  <span className="text-emerald-400">•</span>
+                  <span className="text-emerald-500/60">›</span>
                   <span>Updates & new features</span>
                 </li>
                 <li className="flex items-center space-x-2">
-                  <span className="text-emerald-400">•</span>
+                  <span className="text-emerald-500/60">›</span>
                   <span>Exclusive sample packs and MIDIs</span>
                 </li>
               </ul>
@@ -216,11 +180,11 @@ const EmailGateModal = ({
                 variant="outline"
                 onClick={handleClose}
                 disabled={isSubmitting}
-                className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
+                className="flex-1 border-slate-700/50 text-slate-400 hover:bg-slate-800/40 hover:text-white transition-all"
               >
                 Cancel
               </Button>
-              
+
               <Button
                 type="submit"
                 disabled={isSubmitting || !formData.email.trim()}
@@ -240,8 +204,7 @@ const EmailGateModal = ({
               </Button>
             </div>
 
-            {/* Privacy Notice */}
-            <p className="text-xs text-slate-400 text-center">
+            <p className="text-[11px] text-slate-600 text-center">
               We respect your privacy. No spam, unsubscribe anytime.
             </p>
           </form>
@@ -251,4 +214,4 @@ const EmailGateModal = ({
   );
 };
 
-export default EmailGateModal; 
+export default EmailGateModal;
