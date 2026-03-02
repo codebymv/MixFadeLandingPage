@@ -106,7 +106,7 @@ export class ApiService {
   getDownloadUrl(platform: string, version: string): string {
     // These would be your actual download URLs
     const downloadUrls = {
-      windows: `https://mixfade.s3.us-east-1.amazonaws.com/releases/windows/MixFade+Setup+${version}.exe`,
+      windows: `https://mixfade.s3.us-east-1.amazonaws.com/releases/v${version}/MixFade%20Setup%20${version}.exe`,
       // Add other platforms if needed in the future
     };
 

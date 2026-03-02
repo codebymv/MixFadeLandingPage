@@ -20,7 +20,7 @@ export interface VersionInfo {
 }
 
 // Current release configuration
-export const CURRENT_VERSION = '0.9.4';
+export const CURRENT_VERSION = '0.9.5';
 
 // Base URLs for different hosting providers
 export const DOWNLOAD_BASE_URLS = {
@@ -35,8 +35,8 @@ const BASE_URL = 'https://mixfade.s3.us-east-1.amazonaws.com/releases';
 // Download URLs for all supported platforms
 export const DOWNLOAD_URLS: Record<string, DownloadInfo> = {
   windows: {
-    url: 'https://mixfade.s3.us-east-1.amazonaws.com/releases/windows/MixFade+Setup+0.9.4.exe',
-    filename: 'MixFade Setup 0.9.4.exe',
+    url: `https://mixfade.s3.us-east-1.amazonaws.com/releases/v${CURRENT_VERSION}/MixFade%20Setup%20${CURRENT_VERSION}.exe`,
+    filename: `MixFade Setup ${CURRENT_VERSION}.exe`,
     size: '80.90 MB'
   },
   macos: {
@@ -53,6 +53,34 @@ export const DOWNLOAD_URLS: Record<string, DownloadInfo> = {
 
 // Version history with download links
 export const VERSION_HISTORY: VersionInfo[] = [
+  {
+    version: '0.9.5',
+    date: '2026-03-01',
+    size: '80.90 MB download (294.6 MB installed)',
+    changes: [
+      'Release refresh with latest production fixes',
+      'Updated security monitoring and download flow hardening',
+      'Improved production build hygiene and release consistency',
+      'Bug fixes and stability improvements'
+    ],
+    downloads: {
+      windows: {
+        url: 'https://mixfade.s3.us-east-1.amazonaws.com/releases/v0.9.5/MixFade%20Setup%200.9.5.exe',
+        filename: 'MixFade Setup 0.9.5.exe',
+        size: '80.90 MB'
+      },
+      macos: {
+        url: `${BASE_URL}/macos/MixFade-0.9.4-macOS-x64.dmg`,
+        filename: 'MixFade-0.9.4-macOS-x64.dmg',
+        size: '87.1 MB'
+      },
+      linux: {
+        url: `${BASE_URL}/v0.9.4/MixFade-0.9.4.AppImage`,
+        filename: 'MixFade-0.9.4.AppImage',
+        size: '89.3 MB'
+      }
+    }
+  },
   {
     version: '0.9.4',
     date: '2025-07-03',
