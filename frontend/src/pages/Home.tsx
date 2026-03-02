@@ -186,20 +186,22 @@ const Home = () => {
 
             {/* Feature 2: Real-time Processing (reversed) */}
             <div className="feature-row reversed animate-reveal delay-2">
-              <div
-                className={`image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-fusion bg-slate-800/20 transition-opacity duration-500 flex items-center justify-center ${allFeaturesReady ? "opacity-100" : "opacity-0"
-                  }`}
-              >
+              <div className="flex justify-center w-full">
                 <div
-                  className={`w-full aspect-[4/3] bg-slate-700/20 animate-pulse ${allFeaturesReady ? "hidden" : "block"
+                  className={`image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-fusion bg-slate-800/50 transition-opacity duration-500 ${allFeaturesReady ? "opacity-100" : "opacity-0"
                     }`}
-                />
-                <img
-                  src="/processing.png"
-                  alt="Real-time Processing Interface"
-                  className={`w-full max-h-[500px] object-contain ${allFeaturesReady ? "block" : "hidden"
-                    }`}
-                />
+                >
+                  <div
+                    className={`h-[400px] sm:h-[500px] w-[280px] bg-slate-700/20 animate-pulse ${allFeaturesReady ? "hidden" : "block"
+                      }`}
+                  />
+                  <img
+                    src="/processing.png"
+                    alt="Real-time Processing Interface"
+                    className={`h-[400px] sm:h-[500px] w-auto object-cover ${allFeaturesReady ? "block" : "hidden"
+                      }`}
+                  />
+                </div>
               </div>
               <div className="flex flex-col justify-center">
                 <div className="w-12 h-12 bg-gradient-to-br from-emerald-500/10 to-purple-500/10 rounded-xl flex items-center justify-center mb-5">
@@ -218,20 +220,22 @@ const Home = () => {
 
             {/* Feature 3: Simple File Swapping */}
             <div className="feature-row animate-reveal delay-3">
-              <div
-                className={`image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-purple bg-slate-800/20 transition-opacity duration-500 flex items-center justify-center ${allFeaturesReady ? "opacity-100" : "opacity-0"
-                  }`}
-              >
+              <div className="flex justify-center w-full">
                 <div
-                  className={`w-full aspect-[4/3] bg-slate-700/20 animate-pulse ${allFeaturesReady ? "hidden" : "block"
+                  className={`image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-purple bg-slate-800/50 transition-opacity duration-500 ${allFeaturesReady ? "opacity-100" : "opacity-0"
                     }`}
-                />
-                <img
-                  src="/fileswap.png"
-                  alt="File Swapping Interface"
-                  className={`w-full max-h-[500px] object-contain ${allFeaturesReady ? "block" : "hidden"
-                    }`}
-                />
+                >
+                  <div
+                    className={`h-[400px] sm:h-[500px] w-[280px] bg-slate-700/20 animate-pulse ${allFeaturesReady ? "hidden" : "block"
+                      }`}
+                  />
+                  <img
+                    src="/fileswap.png"
+                    alt="File Swapping Interface"
+                    className={`h-[400px] sm:h-[500px] w-auto object-cover ${allFeaturesReady ? "block" : "hidden"
+                      }`}
+                  />
+                </div>
               </div>
               <div className="flex flex-col justify-center">
                 <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-5">
