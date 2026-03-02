@@ -187,7 +187,7 @@ const Home = () => {
             {/* Feature 2: Real-time Processing (reversed) */}
             <div className="feature-row reversed animate-reveal delay-2">
               <div
-                className={`image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-fusion bg-slate-800/20 transition-opacity duration-500 ${allFeaturesReady ? "opacity-100" : "opacity-0"
+                className={`image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-fusion bg-slate-800/20 transition-opacity duration-500 flex items-center justify-center ${allFeaturesReady ? "opacity-100" : "opacity-0"
                   }`}
               >
                 <div
@@ -197,7 +197,7 @@ const Home = () => {
                 <img
                   src="/processing.png"
                   alt="Real-time Processing Interface"
-                  className={`w-full h-full object-cover ${allFeaturesReady ? "block" : "hidden"
+                  className={`w-full max-h-[500px] object-contain ${allFeaturesReady ? "block" : "hidden"
                     }`}
                 />
               </div>
@@ -219,7 +219,7 @@ const Home = () => {
             {/* Feature 3: Simple File Swapping */}
             <div className="feature-row animate-reveal delay-3">
               <div
-                className={`image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-purple bg-slate-800/20 transition-opacity duration-500 ${allFeaturesReady ? "opacity-100" : "opacity-0"
+                className={`image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-purple bg-slate-800/20 transition-opacity duration-500 flex items-center justify-center ${allFeaturesReady ? "opacity-100" : "opacity-0"
                   }`}
               >
                 <div
@@ -229,7 +229,7 @@ const Home = () => {
                 <img
                   src="/fileswap.png"
                   alt="File Swapping Interface"
-                  className={`w-full h-full object-cover ${allFeaturesReady ? "block" : "hidden"
+                  className={`w-full max-h-[500px] object-contain ${allFeaturesReady ? "block" : "hidden"
                     }`}
                 />
               </div>
