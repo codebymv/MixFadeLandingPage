@@ -7,6 +7,44 @@ class SecurityMonitor {
   constructor() {
     this.suspiciousIPs = new Map(); // IP -> { count, lastSeen, violations }
     this.cleanupInterval = setInterval(() => this.cleanup(), 60 * 60 * 1000); // Cleanup every hour
+    this.suspiciousUserAgentPatterns = [
+      /\bsqlmap\b/i,
+      /\bnikto\b/i,
+      /\bnmap\b/i,
+      /\bburp\b/i,
+      /\bacunetix\b/i,
+      /\bmasscan\b/i,
+      /\bnessus\b/i,
+      /\bwpscan\b/i,
+      /\bdirbuster\b/i,
+      /\bgobuster\b/i,
+      /\bfuzz\b/i,
+      /\bcurl\/\d/i,
+      /\bwget\/\d/i,
+      /\bpython-requests\b/i,
+      /\blibwww-perl\b/i,
+      /\bhttpclient\b/i
+    ];
+    this.suspiciousPathPatterns = [
+      /\/wp-admin/i,
+      /\/wp-login/i,
+      /\/xmlrpc\.php/i,
+      /\/\.env/i,
+      /\/phpmyadmin/i,
+      /\/\.git/i,
+      /\/config\.php/i,
+      /\/etc\/passwd/i,
+      /\/proc\/self\/environ/i,
+      /\/vendor\/phpunit/i
+    ];
+    this.suspiciousQueryPatterns = [
+      /\bunion\b.{0,20}\bselect\b/i,
+      /\b(or|and)\b\s+\d+\s*=\s*\d+/i,
+      /<\s*script/i,
+      /javascript:/i,
+      /\bselect\b.{0,20}\bfrom\b/i,
+      /\bdrop\b.{0,20}\btable\b/i
+    ];
   }
 
   /**
@@ -40,19 +78,32 @@ class SecurityMonitor {
       }
 
       // Check User-Agent for suspicious patterns
-      const suspiciousUserAgents = [
-        /sqlmap/i,
-        /nikto/i,
-        /nmap/i,
-        /burp/i,
-        /scanner/i,
-        /bot.*hack/i,
-      ];
-
-      for (const pattern of suspiciousUserAgents) {
+      for (const pattern of this.suspiciousUserAgentPatterns) {
         if (pattern.test(userAgent)) {
           violations.push(`Suspicious User-Agent: ${pattern.toString()}`);
         }
+      }
+
+      // Check path and query for common reconnaissance and exploit probes
+      const decodedUrl = this.safeDecode(req.url || '');
+      const normalizedPath = `${path}${req.query ? `?${new URLSearchParams(req.query).toString()}` : ''}`;
+      const combinedInput = `${decodedUrl} ${normalizedPath}`;
+
+      for (const pattern of this.suspiciousPathPatterns) {
+        if (pattern.test(decodedUrl) || pattern.test(path)) {
+          violations.push(`Suspicious path probe: ${pattern.toString()}`);
+        }
+      }
+
+      for (const pattern of this.suspiciousQueryPatterns) {
+        if (pattern.test(combinedInput)) {
+          violations.push(`Suspicious query pattern: ${pattern.toString()}`);
+        }
+      }
+
+      // Encoded traversal detection often appears in scanner traffic
+      if (/%2e%2e%2f|%2f%2e%2e|%252e%252e%252f/i.test(req.url || '')) {
+        violations.push('Encoded path traversal pattern detected');
       }
 
       // Check for rapid requests from same IP
@@ -136,6 +187,14 @@ class SecurityMonitor {
     }
 
     console.log(`Security monitor cleanup: ${this.suspiciousIPs.size} IPs being monitored`);
+  }
+
+  safeDecode(value) {
+    try {
+      return decodeURIComponent(value);
+    } catch (error) {
+      return value;
+    }
   }
 
   /**

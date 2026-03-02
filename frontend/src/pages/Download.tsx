@@ -5,7 +5,7 @@ import { Download, Calendar, FileText, Zap, Waves, Settings, Headphones, Monitor
 import Footer from "@/components/Footer";
 import EmailGateModal from "@/components/EmailGateModal";
 // import DownloadAnalytics from "@/components/DownloadAnalytics";
-import { DOWNLOAD_URLS, VERSION_HISTORY, CURRENT_VERSION, ANALYTICS_CONFIG, PLATFORM_MAPPINGS } from "@/config/downloads";
+import { DOWNLOAD_URLS, VERSION_HISTORY, CURRENT_VERSION } from "@/config/downloads";
 import { initiateDownload } from "@/services/api";
 
 // Mobile device detection utility
@@ -44,44 +44,6 @@ const detectPlatform = () => {
   
   // Default to Windows for all desktop platforms
   return 'windows';
-};
-
-// Download tracking utility
-const trackDownload = async (platform: string, version: string) => {
-  if (!ANALYTICS_CONFIG.enabled) return;
-  
-  try {
-    const downloadData = {
-      platform,
-      version,
-      timestamp: new Date().toISOString(),
-      userAgent: navigator.userAgent,
-      referrer: document.referrer,
-      sessionId: crypto.randomUUID()
-    };
-    
-    // Store in localStorage
-    const downloads = JSON.parse(localStorage.getItem(ANALYTICS_CONFIG.storageKey) || '[]');
-    downloads.push(downloadData);
-    
-    // Keep only the most recent records
-    if (downloads.length > ANALYTICS_CONFIG.maxRecords) {
-      downloads.splice(0, downloads.length - ANALYTICS_CONFIG.maxRecords);
-    }
-    
-    localStorage.setItem(ANALYTICS_CONFIG.storageKey, JSON.stringify(downloads));
-    
-    // TODO: Send to analytics service
-    // await fetch(ANALYTICS_CONFIG.endpoints.track, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(downloadData)
-    // });
-    
-    console.log('Download tracked:', downloadData);
-  } catch (error) {
-    console.error('Failed to track download:', error);
-  }
 };
 
 const DownloadPage = () => {
