@@ -20,7 +20,7 @@ export interface VersionInfo {
 }
 
 // Current release configuration
-export const CURRENT_VERSION = '0.9.5';
+export const CURRENT_VERSION = '0.9.7';
 
 // Base URLs for different hosting providers
 export const DOWNLOAD_BASE_URLS = {
@@ -53,6 +53,37 @@ export const DOWNLOAD_URLS: Record<string, DownloadInfo> = {
 
 // Version history with download links
 export const VERSION_HISTORY: VersionInfo[] = [
+  {
+    version: '0.9.7',
+    date: '2026-03-17',
+    size: '80.90 MB download (294.6 MB installed)',
+    changes: [
+      'Keyboard shortcut audit — removed phantom shortcuts, added Escape to exit Visualizer',
+      'Creative theme names: Midnight Bloom, Golden Hour, Neon Dusk',
+      'SVG curve icons for crossfade curve selector',
+      'Simplified settings panel — removed verbose labels and Active badge',
+      'Restored split A/B background gradient',
+      'Version display in UI corner',
+      'Bug fixes and stability improvements'
+    ],
+    downloads: {
+      windows: {
+        url: 'https://mixfade.s3.us-east-1.amazonaws.com/releases/v0.9.7/MixFade%20Setup%200.9.7.exe',
+        filename: 'MixFade Setup 0.9.7.exe',
+        size: '80.90 MB'
+      },
+      macos: {
+        url: `${BASE_URL}/macos/MixFade-0.9.7-macOS-x64.dmg`,
+        filename: 'MixFade-0.9.7-macOS-x64.dmg',
+        size: '87.1 MB'
+      },
+      linux: {
+        url: `${BASE_URL}/v0.9.7/MixFade-0.9.7.AppImage`,
+        filename: 'MixFade-0.9.7.AppImage',
+        size: '89.3 MB'
+      }
+    }
+  },
   {
     version: '0.9.5',
     date: '2026-03-01',
