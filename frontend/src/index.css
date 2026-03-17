@@ -48,6 +48,10 @@
     --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
   }
 
+  html {
+    font-size: 120%;
+  }
+
   * {
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     @apply border-border;

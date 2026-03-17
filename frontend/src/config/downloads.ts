@@ -37,7 +37,7 @@ export const DOWNLOAD_URLS: Record<string, DownloadInfo> = {
   windows: {
     url: `https://mixfade.s3.us-east-1.amazonaws.com/releases/v${CURRENT_VERSION}/MixFade%20Setup%20${CURRENT_VERSION}.exe`,
     filename: `MixFade Setup ${CURRENT_VERSION}.exe`,
-    size: '80.90 MB'
+    size: '82.80 MB'
   },
   macos: {
     url: `${BASE_URL}/macos/MixFade-${CURRENT_VERSION}-macOS-x64.dmg`,
@@ -56,7 +56,7 @@ export const VERSION_HISTORY: VersionInfo[] = [
   {
     version: '0.9.7',
     date: '2026-03-17',
-    size: '80.90 MB download (294.6 MB installed)',
+    size: '82.80 MB download (294.6 MB installed)',
     changes: [
       'New Visualizer tab — seed-driven audio-reactive fullscreen visuals powered by Butterchurn',
       'Save Current Seed — bookmark visual presets and reload them across sessions',
@@ -71,7 +71,7 @@ export const VERSION_HISTORY: VersionInfo[] = [
       windows: {
         url: 'https://mixfade.s3.us-east-1.amazonaws.com/releases/v0.9.7/MixFade%20Setup%200.9.7.exe',
         filename: 'MixFade Setup 0.9.7.exe',
-        size: '80.90 MB'
+        size: '82.80 MB'
       },
       macos: {
         url: `${BASE_URL}/macos/MixFade-0.9.7-macOS-x64.dmg`,
