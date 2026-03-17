@@ -67,10 +67,10 @@ const Home = () => {
 
               {/* Headline */}
               <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] mb-6 animate-reveal delay-1">
-                <span className="text-white">Audio analysis &</span>
+                <span className="text-white">Audio</span>
                 <br />
                 <span className="text-gradient-emerald-purple">
-                  comparative playback
+                  analysis & playback
                 </span>
                 <br />
                 <span className="text-white">engine.</span>
