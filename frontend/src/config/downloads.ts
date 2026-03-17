@@ -58,12 +58,13 @@ export const VERSION_HISTORY: VersionInfo[] = [
     date: '2026-03-17',
     size: '80.90 MB download (294.6 MB installed)',
     changes: [
-      'Keyboard shortcut audit — removed phantom shortcuts, added Escape to exit Visualizer',
-      'Creative theme names: Midnight Bloom, Golden Hour, Neon Dusk',
-      'SVG curve icons for crossfade curve selector',
-      'Simplified settings panel — removed verbose labels and Active badge',
-      'Restored split A/B background gradient',
-      'Version display in UI corner',
+      'New Visualizer tab — seed-driven audio-reactive fullscreen visuals powered by Butterchurn',
+      'Save Current Seed — bookmark visual presets and reload them across sessions',
+      'Per-deck loop toggle — loop any deck independently during A/B playback',
+      'Collapsible analysis sections — Levels, Frequencies, Stereo, and Spectrogram each collapse independently',
+      'Deck color theme selector in Settings — choose from multiple A/B colour pairings',
+      'Version number displayed in header corner and Settings panel',
+      'Keyboard shortcut additions: Ctrl+O to open file, 1/2 to switch tracks, Escape to exit Visualizer',
       'Bug fixes and stability improvements'
     ],
     downloads: {
