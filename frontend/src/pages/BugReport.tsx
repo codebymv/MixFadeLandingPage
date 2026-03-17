@@ -96,7 +96,7 @@ const BugReport = () => {
           </div>
 
           <p className="text-lg text-slate-400 mb-0 max-w-2xl mx-auto animate-reveal delay-1">
-            Found an issue? Help the product level up by reporting bugs.
+            Found an issue? Help the project level up by reporting bugs.
           </p>
         </div>
       </section>

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Download, Headphones, Zap, Files, ArrowRight } from "lucide-react";
+import { Download, Headphones, Zap, Files, Monitor, ArrowRight } from "lucide-react";
 import Footer from "@/components/Footer";
 import { useImagePreloader } from "@/hooks/useImagePreloader";
 
@@ -9,7 +9,7 @@ const LOGO_IMAGES = [
   "/OS_Full_Logo_transparent.png",
 ];
 
-const FEATURE_IMAGES = ["/ui.png", "/dj.png", "/processing.png", "/fileswap.png"];
+const FEATURE_IMAGES = ["/mixfade-ui-26.png", "/mixfade-deck-26.png", "/mixfade-ui-analytics-26.png", "/mixfade-ui-files-26.png", "/mixfade-visualizer-26.png"];
 
 const Home = () => {
   const { imagesLoaded: logosLoaded, loadedImages: loadedLogos } =
@@ -118,7 +118,7 @@ const Home = () => {
                       }`}
                   />
                   <img
-                    src="/ui.png"
+                    src="/mixfade-ui-26.png"
                     alt="MixFade Complete Interface"
                     className={`w-full object-cover ${allFeaturesReady ? "block" : "hidden"
                       }`}
@@ -163,7 +163,7 @@ const Home = () => {
                     }`}
                 />
                 <img
-                  src="/dj.png"
+                  src="/mixfade-deck-26.png"
                   alt="DJ-Style Playback Interface"
                   className={`w-full h-full object-cover ${allFeaturesReady ? "block" : "hidden"
                     }`}
@@ -196,7 +196,7 @@ const Home = () => {
                       }`}
                   />
                   <img
-                    src="/processing.png"
+                    src="/mixfade-ui-analytics-26.png"
                     alt="Real-time Processing Interface"
                     className={`h-[400px] sm:h-[500px] w-auto object-cover ${allFeaturesReady ? "block" : "hidden"
                       }`}
@@ -222,7 +222,7 @@ const Home = () => {
             <div className="feature-row animate-reveal delay-3">
               <div className="flex justify-center w-full">
                 <div
-                  className={`image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-purple bg-slate-800/50 transition-opacity duration-500 ${allFeaturesReady ? "opacity-100" : "opacity-0"
+                  className={`image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-green bg-slate-800/50 transition-opacity duration-500 ${allFeaturesReady ? "opacity-100" : "opacity-0"
                     }`}
                 >
                   <div
@@ -230,7 +230,7 @@ const Home = () => {
                       }`}
                   />
                   <img
-                    src="/fileswap.png"
+                    src="/mixfade-ui-files-26.png"
                     alt="File Swapping Interface"
                     className={`h-[400px] sm:h-[500px] w-auto object-cover ${allFeaturesReady ? "block" : "hidden"
                       }`}
@@ -238,8 +238,8 @@ const Home = () => {
                 </div>
               </div>
               <div className="flex flex-col justify-center">
-                <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-5">
-                  <Files className="w-6 h-6 text-purple-400" />
+                <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-5">
+                  <Files className="w-6 h-6 text-emerald-400" />
                 </div>
                 <h3 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4">
                   Simple File Swapping
@@ -248,6 +248,38 @@ const Home = () => {
                   Pull from dozens of recently added files to quickly swap
                   between sources on the fly. Drag, drop, and compare in
                   seconds.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 4: Real-time Unique Visuals (reversed) */}
+            <div className="feature-row reversed animate-reveal delay-4">
+              <div
+                className={`image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-purple bg-slate-800/20 transition-opacity duration-500 ${allFeaturesReady ? "opacity-100" : "opacity-0"
+                  }`}
+              >
+                <div
+                  className={`w-full aspect-video bg-slate-700/20 animate-pulse rounded-xl ${allFeaturesReady ? "hidden" : "block"
+                    }`}
+                />
+                <img
+                  src="/mixfade-visualizer-26.png"
+                  alt="Real-time Unique Visuals"
+                  className={`w-full object-cover ${allFeaturesReady ? "block" : "hidden"
+                    }`}
+                />
+              </div>
+              <div className="flex flex-col justify-center">
+                <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-5">
+                  <Monitor className="w-6 h-6 text-purple-400" />
+                </div>
+                <h3 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4">
+                  Real-time Unique Visuals
+                </h3>
+                <p className="text-slate-400 leading-relaxed text-lg">
+                  Seed-driven audio visualizations that react to your music in
+                  real time. Roll a new look whenever you want — no two visuals
+                  are the same.
                 </p>
               </div>
             </div>
