@@ -551,6 +551,51 @@
   }
 }
 
+/* iPhone SE and smaller devices */
+@media (max-width: 375px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  section {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .font-display {
+    text-align: center;
+  }
+
+  .text-4xl, .sm\:text-5xl, .lg\:text-6xl {
+    font-size: 2.5rem; /* Adjust hero headline size */
+    text-align: center;
+  }
+
+  .flex-col, .sm\:flex-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .items-start {
+    align-items: center;
+  }
+
+  .max-w-xl, .max-w-md, .max-w-lg {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  .feature-row {
+    text-align: center;
+  }
+
+  .feature-row .flex.justify-center {
+    margin-bottom: 1.5rem;
+  }
+}
+
 /* ═══════════════════════════════════════════════
    PERSPECTIVE / 3D CARD TILT
    ═══════════════════════════════════════════════ */
