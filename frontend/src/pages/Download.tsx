@@ -79,7 +79,6 @@ const DownloadPage = () => {
     setIsDownloading(true);
     try {
       await initiateDownload(sessionId, '', pendingDownload.platform, pendingDownload.version);
-      console.log(`Download started: MixFade v${pendingDownload.version} for ${pendingDownload.platform}`);
     } catch (error) {
       console.error('Download failed:', error);
       alert('Download failed. Please try again later.');

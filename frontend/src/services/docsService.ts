@@ -413,10 +413,16 @@ This guide will help you set up the MixFade development environment from the Git
 - npm or yarn
 - Git
 
-### Clone the Repository
+### Repository Access
+
+\`\`\`text
+The MixFade source repository is currently private.
+\`\`\`
+
+### If You Have Access
 
 \`\`\`bash
-git clone https://github.com/yourusername/mixfade.git
+git clone <your MixFade repository URL>
 cd mixfade
 \`\`\`
 

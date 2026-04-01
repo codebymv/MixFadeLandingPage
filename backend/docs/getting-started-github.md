@@ -11,13 +11,18 @@ Before you begin developing MixFade, ensure you have the following installed:
 
 ## Environment Setup
 
-### 1. Clone the Repository
+### 1. Repository Access
+```text
+The MixFade source repository is currently private.
+```
+
+### 2. If You Have Access
 ```bash
-git clone https://github.com/yourusername/mixfade.git
+git clone <your MixFade repository URL>
 cd MixFade/Prototype4
 ```
 
-### 2. Install Dependencies
+### 3. Install Dependencies
 ```bash
 npm install
 ```
