@@ -2,7 +2,7 @@
 
 Welcome to **MixFade** – your professional audio analysis and A/B comparison tool! 🎵
 
-> 📋 **Running v0.9.7** — Check out the [Version 0.9.7 Release Notes](/help/Version/0.9.7-overview) to see what's new
+> 📋 **Running v0.9.8** — Check out the [Version 0.9.8 Release Notes](/help/Version/0.9.8-overview) to see what's new
 
 ## 🚀 Quick Start
 
