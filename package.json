@@ -25,6 +25,8 @@
 
     "lint": "cd frontend && npm run lint",
     "test": "cd frontend && npm run test",
+    "check": "npm run lint && npm run docs:check && npm run validate:releases && npm run build:frontend && npm run build:backend",
+    "check:quick": "npm run lint && npm run docs:check && npm run validate:releases",
     "validate:releases": "node validate-release-config.js",
     "docs:sync": "node sync-docs.js sync",
     "docs:watch": "node sync-docs.js watch",
