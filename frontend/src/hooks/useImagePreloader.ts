@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface UseImagePreloaderOptions {
   images: string[];
@@ -21,6 +21,13 @@ export const useImagePreloader = ({
   const [isLoading, setIsLoading] = useState(true);
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
+  const onLoadRef = useRef(onLoad);
+  const onErrorRef = useRef(onError);
+
+  useEffect(() => {
+    onLoadRef.current = onLoad;
+    onErrorRef.current = onError;
+  }, [onLoad, onError]);
 
   useEffect(() => {
     if (images.length === 0) {
@@ -61,7 +68,7 @@ export const useImagePreloader = ({
             result.status === 'rejected' ? result.reason : new Error('Unknown error')
           );
           console.warn('Some images failed to preload:', errors);
-          onError?.(new Error(`${failed.length} images failed to load`));
+          onErrorRef.current?.(new Error(`${failed.length} images failed to load`));
         }
         
         // Add a delay to prevent mobile flash/reload issues
@@ -73,16 +80,16 @@ export const useImagePreloader = ({
         setTimeout(() => {
           setImagesLoaded(successful > 0 || images.length === 0);
           setIsLoading(false);
-          onLoad?.();
+          onLoadRef.current?.();
         }, delay);
       })
       .catch(error => {
         console.error('Critical error during image preloading:', error);
         setImagesLoaded(true); // Fail gracefully
         setIsLoading(false);
-        onError?.(error);
+        onErrorRef.current?.(error);
       });
-  }, [images]); // Removed onLoad and onError from dependencies to prevent infinite loop
+  }, [images]);
 
   const progress = images.length > 0 ? (loadedImages.size / images.length) * 100 : 100;
 

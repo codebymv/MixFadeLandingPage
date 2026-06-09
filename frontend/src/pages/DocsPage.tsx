@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -105,7 +105,7 @@ const DocsPage: React.FC = () => {
     ));
   };
 
-  const findItemByPath = (items: DocStructure[], path: string): DocStructure | null => {
+  const findItemByPath = useCallback((items: DocStructure[], path: string): DocStructure | null => {
     for (const item of items) {
       if (item.path === path) return item;
       if (item.children) {
@@ -114,7 +114,7 @@ const DocsPage: React.FC = () => {
       }
     }
     return null;
-  };
+  }, []);
 
   useEffect(() => {
     const fetchDocContent = async () => {
@@ -153,7 +153,7 @@ const DocsPage: React.FC = () => {
 
     fetchDocContent();
     fetchDocStructure();
-  }, [docPath]);
+  }, [docPath, findItemByPath]);
 
   useEffect(() => {
     const syncHeights = () => {
