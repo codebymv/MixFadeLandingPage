@@ -50,14 +50,14 @@ const createDownloads = (
 export const DOWNLOAD_URLS: Record<string, DownloadInfo> = createDownloads(
   CURRENT_VERSION,
   `https://mixfade.s3.us-east-1.amazonaws.com/releases/v${CURRENT_VERSION}/MixFade%20Setup%20${CURRENT_VERSION}.exe`,
-  '89.40 MB'
+  '82.82 MB'
 );
 
 export const VERSION_HISTORY: VersionInfo[] = [
   {
     version: '0.9.8',
     date: '2026-04-01',
-    size: '89.40 MB download (updated Windows installer)',
+    size: '82.82 MB download (updated Windows installer)',
     changes: [
       'Deck upload cards now use deck-specific color styling instead of the shared fusion gradient',
       'Crossfade logic extracted into a dedicated hook with improved transition safety',
@@ -69,7 +69,7 @@ export const VERSION_HISTORY: VersionInfo[] = [
     downloads: createDownloads(
       '0.9.8',
       'https://mixfade.s3.us-east-1.amazonaws.com/releases/v0.9.8/MixFade%20Setup%200.9.8.exe',
-      '89.40 MB'
+      '82.82 MB'
     ),
   },
   {
