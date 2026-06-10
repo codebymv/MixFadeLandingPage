@@ -24,7 +24,7 @@
     "railway:start": "npm run start:backend",
 
     "lint": "cd frontend && npm run lint",
-    "test": "cd frontend && npm run test",
+    "test": "node --test \"tests/**/*.test.js\"",
     "check": "npm run lint && npm run docs:check && npm run validate:releases && npm run build:frontend && npm run build:backend",
     "check:quick": "npm run lint && npm run docs:check && npm run validate:releases",
     "validate:releases": "node validate-release-config.js",
