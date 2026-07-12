@@ -2,32 +2,8 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Download, Headphones, Zap, Files, Monitor, ArrowRight } from "lucide-react";
 import Footer from "@/components/Footer";
-import { useImagePreloader } from "@/hooks/useImagePreloader";
-
-const LOGO_IMAGES = [
-  "/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.png",
-  "/OS_Full_Logo_transparent.png",
-];
-
-const BELOW_FOLD_IMAGES = [
-  "/mixfade-deck-26.png",
-  "/mixfade-ui-analytics-26.png",
-  "/mixfade-ui-files-26.png",
-  "/mixfade-visualizer-26.png",
-];
 
 const Home = () => {
-  const { imagesLoaded: logosLoaded, loadedImages: loadedLogos } =
-    useImagePreloader({ images: LOGO_IMAGES });
-
-  // Below-fold only — do not gate the hero LCP image on these
-  const { imagesLoaded: featuresLoaded, loadedImages: loadedFeatures } =
-    useImagePreloader({ images: BELOW_FOLD_IMAGES });
-
-  const allLogosReady = logosLoaded && loadedLogos.size === LOGO_IMAGES.length;
-  const allFeaturesReady =
-    featuresLoaded && loadedFeatures.size === BELOW_FOLD_IMAGES.length;
-
   return (
     <div className="min-h-screen bg-slate-900 noise-bg relative">
       {/* ═══════════════════════════════════════
@@ -46,16 +22,13 @@ const Home = () => {
             {/* Left: Text Content */}
             <div className="max-w-xl">
               {/* Logo pair */}
-              <div
-                className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-5 mb-10 transition-opacity duration-700 ${allLogosReady ? "opacity-100" : "opacity-0"
-                  } animate-reveal`}
-              >
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-5 mb-10 animate-reveal">
                 <img
                   src="/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.png"
                   alt="MixFade Logo"
                   className="w-56 h-14 object-contain"
                   loading="eager"
-                  decoding="sync"
+                  decoding="async"
                 />
                 <span className="text-slate-400 text-sm font-medium tracking-wider uppercase">
                   by
@@ -66,7 +39,7 @@ const Home = () => {
                     alt="OpaqueSound Logo"
                     className="w-44 h-11 object-contain opacity-80 hover:opacity-100 transition-opacity duration-300"
                     loading="eager"
-                    decoding="sync"
+                    decoding="async"
                   />
                 </Link>
               </div>
@@ -112,20 +85,22 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Right: Hero Screenshot — eager LCP, never gated on below-fold images */}
+            {/* Right: Hero Screenshot — eager LCP; preload is in index.html */}
             <div className="perspective-container animate-reveal-scale delay-3">
               <div className="card-tilt rounded-xl overflow-hidden border border-slate-700/30 neon-glow-fusion bg-slate-800/20">
                 <div className="relative">
-                  <img
-                    src="/mixfade-ui-26.png"
-                    alt="MixFade Complete Interface"
-                    className="w-full object-cover"
-                    width={1280}
-                    height={720}
-                    loading="eager"
-                    fetchPriority="high"
-                    decoding="async"
-                  />
+                  <picture>
+                    <source type="image/webp" srcSet="/mixfade-ui-26.webp" />
+                    <img
+                      src="/mixfade-ui-26.png"
+                      alt="MixFade Complete Interface"
+                      className="w-full object-cover"
+                      width={1280}
+                      height={720}
+                      loading="eager"
+                      decoding="async"
+                    />
+                  </picture>
                 </div>
               </div>
             </div>
@@ -157,22 +132,17 @@ const Home = () => {
           <div className="space-y-20 lg:space-y-28">
             {/* Feature 1: DJ-Style Playback */}
             <div className="feature-row animate-reveal delay-1">
-              <div
-                className={`image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-green bg-slate-800/20 transition-opacity duration-500 ${allFeaturesReady ? "opacity-100" : "opacity-0"
-                  }`}
-              >
-                <div
-                  className={`w-full aspect-[4/3] bg-slate-700/20 animate-pulse ${allFeaturesReady ? "hidden" : "block"
-                    }`}
-                />
-                <img
-                  src="/mixfade-deck-26.png"
-                  alt="DJ-Style Playback Interface"
-                  className={`w-full h-full object-cover ${allFeaturesReady ? "block" : "hidden"
-                    }`}
-                  loading="lazy"
-                  decoding="async"
-                />
+              <div className="image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-green bg-slate-800/20">
+                <picture>
+                  <source type="image/webp" srcSet="/mixfade-deck-26.webp" />
+                  <img
+                    src="/mixfade-deck-26.png"
+                    alt="DJ-Style Playback Interface"
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </picture>
               </div>
               <div className="flex flex-col justify-center">
                 <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-5">
@@ -192,20 +162,17 @@ const Home = () => {
             {/* Feature 2: Real-time Processing (reversed) */}
             <div className="feature-row reversed animate-reveal delay-2">
               <div className="flex justify-center w-full">
-                <div
-                  className={`image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-fusion bg-slate-800/50 transition-opacity duration-500 ${allFeaturesReady ? "opacity-100" : "opacity-0"
-                    }`}
-                >
-                  <div
-                    className={`h-[400px] sm:h-[500px] w-[280px] bg-slate-700/20 animate-pulse ${allFeaturesReady ? "hidden" : "block"
-                      }`}
-                  />
-                  <img
-                    src="/mixfade-ui-analytics-26.png"
-                    alt="Real-time Processing Interface"
-                    className={`h-[400px] sm:h-[500px] w-auto object-cover ${allFeaturesReady ? "block" : "hidden"
-                      }`}
-                  />
+                <div className="image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-fusion bg-slate-800/50">
+                  <picture>
+                    <source type="image/webp" srcSet="/mixfade-ui-analytics-26.webp" />
+                    <img
+                      src="/mixfade-ui-analytics-26.png"
+                      alt="Real-time Processing Interface"
+                      className="h-[400px] sm:h-[500px] w-auto object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </picture>
                 </div>
               </div>
               <div className="flex flex-col justify-center">
@@ -226,20 +193,17 @@ const Home = () => {
             {/* Feature 3: Simple File Swapping */}
             <div className="feature-row animate-reveal delay-3">
               <div className="flex justify-center w-full">
-                <div
-                  className={`image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-green bg-slate-800/50 transition-opacity duration-500 ${allFeaturesReady ? "opacity-100" : "opacity-0"
-                    }`}
-                >
-                  <div
-                    className={`h-[400px] sm:h-[500px] w-[280px] bg-slate-700/20 animate-pulse ${allFeaturesReady ? "hidden" : "block"
-                      }`}
-                  />
-                  <img
-                    src="/mixfade-ui-files-26.png"
-                    alt="File Swapping Interface"
-                    className={`h-[400px] sm:h-[500px] w-auto object-cover ${allFeaturesReady ? "block" : "hidden"
-                      }`}
-                  />
+                <div className="image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-green bg-slate-800/50">
+                  <picture>
+                    <source type="image/webp" srcSet="/mixfade-ui-files-26.webp" />
+                    <img
+                      src="/mixfade-ui-files-26.png"
+                      alt="File Swapping Interface"
+                      className="h-[400px] sm:h-[500px] w-auto object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </picture>
                 </div>
               </div>
               <div className="flex flex-col justify-center">
@@ -259,20 +223,17 @@ const Home = () => {
 
             {/* Feature 4: Real-time Unique Visuals (reversed) */}
             <div className="feature-row reversed animate-reveal delay-4">
-              <div
-                className={`image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-purple bg-slate-800/20 transition-opacity duration-500 ${allFeaturesReady ? "opacity-100" : "opacity-0"
-                  }`}
-              >
-                <div
-                  className={`w-full aspect-video bg-slate-700/20 animate-pulse rounded-xl ${allFeaturesReady ? "hidden" : "block"
-                    }`}
-                />
-                <img
-                  src="/mixfade-visualizer-26.png"
-                  alt="Real-time Unique Visuals"
-                  className={`w-full object-cover ${allFeaturesReady ? "block" : "hidden"
-                    }`}
-                />
+              <div className="image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-purple bg-slate-800/20">
+                <picture>
+                  <source type="image/webp" srcSet="/mixfade-visualizer-26.webp" />
+                  <img
+                    src="/mixfade-visualizer-26.png"
+                    alt="Real-time Unique Visuals"
+                    className="w-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </picture>
               </div>
               <div className="flex flex-col justify-center">
                 <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-5">
