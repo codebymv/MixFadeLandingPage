@@ -25,11 +25,18 @@ const Footer: React.FC = () => {
           {/* Brand */}
           <div className="md:col-span-2">
             <Link to="https://opaquesound.com" className="inline-block mb-4 group">
-              <img
-                src="/OS_Initials_Icon_transparent.png"
-                alt="OpaqueSound icon"
-                className="w-8 h-auto opacity-70 group-hover:opacity-100 transition-opacity duration-300"
-              />
+              <picture>
+                <source type="image/webp" srcSet="/OS_Initials_Icon_transparent.webp" />
+                <img
+                  src="/OS_Initials_Icon_transparent.png"
+                  alt="OpaqueSound icon"
+                  className="w-8 h-auto opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+                  width={128}
+                  height={128}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
             </Link>
             <p className="text-sm text-slate-400 max-w-xs leading-relaxed">
               Professional audio tools crafted with precision.

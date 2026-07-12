@@ -42,11 +42,20 @@ const Navigation = () => {
             className="flex items-center space-x-3 group"
             onClick={closeMobileMenu}
           >
-            <img
-              src="/lovable-uploads/2b4957a6-9739-4776-bf94-3ac1d6439ccc.png"
-              alt="MixFade Icon"
-              className="w-8 h-8 transition-transform duration-300 group-hover:scale-110"
-            />
+            <picture>
+              <source
+                type="image/webp"
+                srcSet="/lovable-uploads/2b4957a6-9739-4776-bf94-3ac1d6439ccc.webp"
+              />
+              <img
+                src="/lovable-uploads/2b4957a6-9739-4776-bf94-3ac1d6439ccc.png"
+                alt="MixFade Icon"
+                className="w-8 h-8 transition-transform duration-300 group-hover:scale-110"
+                width={128}
+                height={128}
+                decoding="async"
+              />
+            </picture>
           </Link>
 
           {/* Desktop Navigation */}

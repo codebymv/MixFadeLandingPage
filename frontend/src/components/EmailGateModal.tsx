@@ -94,11 +94,17 @@ const EmailGateModal = ({
             {isSuccess ? (
               <CheckCircle className="w-7 h-7 text-emerald-400" />
             ) : (
-              <img
-                src="/OS_Initials_Icon_transparent.png"
-                alt="OpaqueSound"
-                className="w-8 h-8 object-contain"
-              />
+              <picture>
+                <source type="image/webp" srcSet="/OS_Initials_Icon_transparent.webp" />
+                <img
+                  src="/OS_Initials_Icon_transparent.png"
+                  alt="OpaqueSound"
+                  className="w-8 h-8 object-contain"
+                  width={128}
+                  height={128}
+                  decoding="async"
+                />
+              </picture>
             )}
           </div>
 

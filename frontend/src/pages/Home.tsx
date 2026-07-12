@@ -23,24 +23,37 @@ const Home = () => {
             <div className="max-w-xl">
               {/* Logo pair */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-5 mb-10 animate-reveal">
-                <img
-                  src="/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.png"
-                  alt="MixFade Logo"
-                  className="w-56 h-14 object-contain"
-                  loading="eager"
-                  decoding="async"
-                />
+                <picture>
+                  <source
+                    type="image/webp"
+                    srcSet="/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.webp"
+                  />
+                  <img
+                    src="/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.png"
+                    alt="MixFade Logo"
+                    className="w-56 h-14 object-contain"
+                    width={560}
+                    height={135}
+                    loading="eager"
+                    decoding="async"
+                  />
+                </picture>
                 <span className="text-slate-400 text-sm font-medium tracking-wider uppercase">
                   by
                 </span>
                 <Link to="https://opaquesound.com">
-                  <img
-                    src="/OS_Full_Logo_transparent.png"
-                    alt="OpaqueSound Logo"
-                    className="w-44 h-11 object-contain opacity-80 hover:opacity-100 transition-opacity duration-300"
-                    loading="eager"
-                    decoding="async"
-                  />
+                  <picture>
+                    <source type="image/webp" srcSet="/OS_Full_Logo_transparent.webp" />
+                    <img
+                      src="/OS_Full_Logo_transparent.png"
+                      alt="OpaqueSound Logo"
+                      className="w-44 h-11 object-contain opacity-80 hover:opacity-100 transition-opacity duration-300"
+                      width={400}
+                      height={101}
+                      loading="eager"
+                      decoding="async"
+                    />
+                  </picture>
                 </Link>
               </div>
 
@@ -95,8 +108,8 @@ const Home = () => {
                       src="/mixfade-ui-26.png"
                       alt="MixFade Complete Interface"
                       className="w-full object-cover"
-                      width={1280}
-                      height={720}
+                      width={1164}
+                      height={1055}
                       loading="eager"
                       decoding="async"
                     />
@@ -139,6 +152,8 @@ const Home = () => {
                     src="/mixfade-deck-26.png"
                     alt="DJ-Style Playback Interface"
                     className="w-full h-full object-cover"
+                    width={611}
+                    height={580}
                     loading="lazy"
                     decoding="async"
                   />
@@ -169,6 +184,8 @@ const Home = () => {
                       src="/mixfade-ui-analytics-26.png"
                       alt="Real-time Processing Interface"
                       className="h-[400px] sm:h-[500px] w-auto object-cover"
+                      width={419}
+                      height={624}
                       loading="lazy"
                       decoding="async"
                     />
@@ -200,6 +217,8 @@ const Home = () => {
                       src="/mixfade-ui-files-26.png"
                       alt="File Swapping Interface"
                       className="h-[400px] sm:h-[500px] w-auto object-cover"
+                      width={264}
+                      height={498}
                       loading="lazy"
                       decoding="async"
                     />
@@ -230,6 +249,8 @@ const Home = () => {
                     src="/mixfade-visualizer-26.png"
                     alt="Real-time Unique Visuals"
                     className="w-full object-cover"
+                    width={1280}
+                    height={983}
                     loading="lazy"
                     decoding="async"
                   />

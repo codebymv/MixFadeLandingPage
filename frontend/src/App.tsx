@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,10 +7,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import Navigation from "./components/Navigation";
 import Home from "./pages/Home";
-import DownloadPage from "./pages/Download";
-import BugReport from "./pages/BugReport";
-import DocsPage from "./pages/DocsPage";
 import NotFound from "./pages/NotFound";
+
+const DownloadPage = lazy(() => import("./pages/Download"));
+const BugReport = lazy(() => import("./pages/BugReport"));
+const DocsPage = lazy(() => import("./pages/DocsPage"));
 
 const queryClient = new QueryClient();
 
@@ -26,14 +28,16 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Navigation />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/download" element={<DownloadPage />} />
-            <Route path="/bug-report" element={<BugReport />} />
-            <Route path="/help/*" element={<DocsPage />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Suspense fallback={null}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/download" element={<DownloadPage />} />
+              <Route path="/bug-report" element={<BugReport />} />
+              <Route path="/help/*" element={<DocsPage />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
