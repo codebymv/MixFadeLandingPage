@@ -19,10 +19,31 @@ const Home = () => {
 
         <div className="container mx-auto relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left: Text Content */}
-            <div className="max-w-xl">
-              {/* Logo pair */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-5 mb-10 animate-reveal">
+            {/* Hero screenshot first on mobile so it wins LCP over the nav icon */}
+            <div className="order-1 lg:order-2 perspective-container">
+              <div className="card-tilt rounded-xl overflow-hidden border border-slate-700/30 neon-glow-fusion bg-slate-800/20">
+                <div className="relative">
+                  <picture>
+                    <source type="image/webp" srcSet="/mixfade-ui-26-lcp.webp" />
+                    <img
+                      src="/mixfade-ui-26.png"
+                      alt="MixFade Complete Interface"
+                      className="w-full object-cover"
+                      width={900}
+                      height={816}
+                      loading="eager"
+                      decoding="sync"
+                      fetchPriority="high"
+                    />
+                  </picture>
+                </div>
+              </div>
+            </div>
+
+            {/* Text Content */}
+            <div className="order-2 lg:order-1 max-w-xl">
+              {/* Logo pair — low priority so hero stays LCP */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-5 mb-10">
                 <picture>
                   <source
                     type="image/webp"
@@ -34,8 +55,9 @@ const Home = () => {
                     className="w-56 h-14 object-contain"
                     width={560}
                     height={135}
-                    loading="eager"
+                    loading="lazy"
                     decoding="async"
+                    fetchPriority="low"
                   />
                 </picture>
                 <span className="text-slate-400 text-sm font-medium tracking-wider uppercase">
@@ -50,15 +72,16 @@ const Home = () => {
                       className="w-44 h-11 object-contain opacity-80 hover:opacity-100 transition-opacity duration-300"
                       width={400}
                       height={101}
-                      loading="eager"
+                      loading="lazy"
                       decoding="async"
+                      fetchPriority="low"
                     />
                   </picture>
                 </Link>
               </div>
 
               {/* Headline */}
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] mb-6 animate-reveal delay-1">
+              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] mb-6">
                 <span className="text-white">Audio</span>
                 <br />
                 <span className="text-gradient-emerald-purple">
@@ -69,13 +92,13 @@ const Home = () => {
               </h1>
 
               {/* Subhead */}
-              <p className="text-lg text-slate-300 leading-relaxed mb-10 max-w-md animate-reveal delay-2">
+              <p className="text-lg text-slate-300 leading-relaxed mb-10 max-w-md">
                 Seamlessly A/B your audio sources with references. Built for
                 producers, engineers, and anyone who cares about sound.
               </p>
 
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row gap-6 animate-reveal delay-3">
+              <div className="flex flex-col sm:flex-row gap-6">
                 <Link to="/download" className="inline-flex min-h-12">
                   <Button
                     size="lg"
@@ -95,26 +118,6 @@ const Home = () => {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
-              </div>
-            </div>
-
-            {/* Right: Hero Screenshot — eager LCP; preload is in index.html */}
-            <div className="perspective-container animate-reveal-scale delay-3">
-              <div className="card-tilt rounded-xl overflow-hidden border border-slate-700/30 neon-glow-fusion bg-slate-800/20">
-                <div className="relative">
-                  <picture>
-                    <source type="image/webp" srcSet="/mixfade-ui-26.webp" />
-                    <img
-                      src="/mixfade-ui-26.png"
-                      alt="MixFade Complete Interface"
-                      className="w-full object-cover"
-                      width={1164}
-                      height={1055}
-                      loading="eager"
-                      decoding="async"
-                    />
-                  </picture>
-                </div>
               </div>
             </div>
           </div>

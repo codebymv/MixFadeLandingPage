@@ -43,17 +43,16 @@ const Navigation = () => {
             onClick={closeMobileMenu}
           >
             <picture>
-              <source
-                type="image/webp"
-                srcSet="/lovable-uploads/2b4957a6-9739-4776-bf94-3ac1d6439ccc.webp"
-              />
+              <source type="image/webp" srcSet="/lovable-uploads/nav-icon-64.webp" />
               <img
                 src="/lovable-uploads/2b4957a6-9739-4776-bf94-3ac1d6439ccc.png"
                 alt="MixFade Icon"
                 className="w-8 h-8 transition-transform duration-300 group-hover:scale-110"
-                width={128}
-                height={128}
+                width={64}
+                height={64}
+                loading="lazy"
                 decoding="async"
+                fetchPriority="low"
               />
             </picture>
           </Link>
