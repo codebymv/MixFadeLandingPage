@@ -9,18 +9,24 @@ const LOGO_IMAGES = [
   "/OS_Full_Logo_transparent.png",
 ];
 
-const FEATURE_IMAGES = ["/mixfade-ui-26.png", "/mixfade-deck-26.png", "/mixfade-ui-analytics-26.png", "/mixfade-ui-files-26.png", "/mixfade-visualizer-26.png"];
+const BELOW_FOLD_IMAGES = [
+  "/mixfade-deck-26.png",
+  "/mixfade-ui-analytics-26.png",
+  "/mixfade-ui-files-26.png",
+  "/mixfade-visualizer-26.png",
+];
 
 const Home = () => {
   const { imagesLoaded: logosLoaded, loadedImages: loadedLogos } =
     useImagePreloader({ images: LOGO_IMAGES });
 
+  // Below-fold only — do not gate the hero LCP image on these
   const { imagesLoaded: featuresLoaded, loadedImages: loadedFeatures } =
-    useImagePreloader({ images: FEATURE_IMAGES });
+    useImagePreloader({ images: BELOW_FOLD_IMAGES });
 
   const allLogosReady = logosLoaded && loadedLogos.size === LOGO_IMAGES.length;
   const allFeaturesReady =
-    featuresLoaded && loadedFeatures.size === FEATURE_IMAGES.length;
+    featuresLoaded && loadedFeatures.size === BELOW_FOLD_IMAGES.length;
 
   return (
     <div className="min-h-screen bg-slate-900 noise-bg relative">
@@ -51,7 +57,7 @@ const Home = () => {
                   loading="eager"
                   decoding="sync"
                 />
-                <span className="text-slate-500 text-sm font-medium tracking-wider uppercase">
+                <span className="text-slate-400 text-sm font-medium tracking-wider uppercase">
                   by
                 </span>
                 <Link to="https://opaquesound.com">
@@ -77,27 +83,27 @@ const Home = () => {
               </h1>
 
               {/* Subhead */}
-              <p className="text-lg text-slate-400 leading-relaxed mb-10 max-w-md animate-reveal delay-2">
+              <p className="text-lg text-slate-300 leading-relaxed mb-10 max-w-md animate-reveal delay-2">
                 Seamlessly A/B your audio sources with references. Built for
                 producers, engineers, and anyone who cares about sound.
               </p>
 
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row gap-4 animate-reveal delay-3">
-                <Link to="/download">
+              <div className="flex flex-col sm:flex-row gap-6 animate-reveal delay-3">
+                <Link to="/download" className="inline-flex min-h-12">
                   <Button
                     size="lg"
-                    className="bg-gradient-to-r from-emerald-500 to-purple-500 hover:from-emerald-600 hover:to-purple-600 text-white font-semibold px-8 py-4 text-lg neon-glow-fusion transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/20"
+                    className="bg-gradient-to-r from-emerald-500 to-purple-500 hover:from-emerald-600 hover:to-purple-600 text-white font-semibold px-8 py-4 text-lg neon-glow-fusion transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/20 min-h-12"
                   >
                     <Download className="mr-2 h-5 w-5" />
                     Download Free
                   </Button>
                 </Link>
-                <Link to="/download?tab=features">
+                <Link to="/download?tab=features" className="inline-flex min-h-12">
                   <Button
                     variant="outline"
                     size="lg"
-                    className="border-slate-700 text-slate-300 hover:bg-slate-800/60 hover:text-white px-8 py-4 text-lg transition-all duration-300 border-gradient-hover"
+                    className="border-slate-700 text-slate-200 hover:bg-slate-800/60 hover:text-white px-8 py-4 text-lg transition-all duration-300 border-gradient-hover min-h-12"
                   >
                     View Features
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -106,22 +112,19 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Right: Hero Screenshot with perspective tilt */}
-            <div
-              className={`perspective-container transition-opacity duration-700 ${allFeaturesReady ? "opacity-100" : "opacity-0"
-                } animate-reveal-scale delay-3`}
-            >
+            {/* Right: Hero Screenshot — eager LCP, never gated on below-fold images */}
+            <div className="perspective-container animate-reveal-scale delay-3">
               <div className="card-tilt rounded-xl overflow-hidden border border-slate-700/30 neon-glow-fusion bg-slate-800/20">
                 <div className="relative">
-                  <div
-                    className={`w-full aspect-video bg-slate-700/20 animate-pulse rounded-xl ${allFeaturesReady ? "hidden" : "block"
-                      }`}
-                  />
                   <img
                     src="/mixfade-ui-26.png"
                     alt="MixFade Complete Interface"
-                    className={`w-full object-cover ${allFeaturesReady ? "block" : "hidden"
-                      }`}
+                    className="w-full object-cover"
+                    width={1280}
+                    height={720}
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="async"
                   />
                 </div>
               </div>
@@ -167,6 +170,8 @@ const Home = () => {
                   alt="DJ-Style Playback Interface"
                   className={`w-full h-full object-cover ${allFeaturesReady ? "block" : "hidden"
                     }`}
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
               <div className="flex flex-col justify-center">
@@ -176,7 +181,7 @@ const Home = () => {
                 <h3 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4">
                   DJ-Style Playback
                 </h3>
-                <p className="text-slate-400 leading-relaxed text-lg">
+                <p className="text-slate-300 leading-relaxed text-lg">
                   Intuitive deck-like controls for smooth audio playback with
                   precision analysis. Swap between tracks instantly with
                   crossfade transitions.
@@ -210,7 +215,7 @@ const Home = () => {
                 <h3 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4">
                   Real-time Processing
                 </h3>
-                <p className="text-slate-400 leading-relaxed text-lg">
+                <p className="text-slate-300 leading-relaxed text-lg">
                   Low-latency, responsive metering for smooth and accurate
                   readings. Watch your levels in real-time as you fine-tune your
                   mix.
@@ -244,7 +249,7 @@ const Home = () => {
                 <h3 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4">
                   Simple File Swapping
                 </h3>
-                <p className="text-slate-400 leading-relaxed text-lg">
+                <p className="text-slate-300 leading-relaxed text-lg">
                   Pull from dozens of recently added files to quickly swap
                   between sources on the fly. Drag, drop, and compare in
                   seconds.
@@ -276,7 +281,7 @@ const Home = () => {
                 <h3 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4">
                   Real-time Unique Visuals
                 </h3>
-                <p className="text-slate-400 leading-relaxed text-lg">
+                <p className="text-slate-300 leading-relaxed text-lg">
                   Seed-driven audio visualizations that react to your music in
                   real time. Roll a new look whenever you want — no two visuals
                   are the same.
@@ -308,7 +313,7 @@ const Home = () => {
               Check it out free.
             </span>
           </h2>
-          <p className="text-xl text-slate-400 mb-10 max-w-lg mx-auto animate-reveal delay-2">
+          <p className="text-xl text-slate-300 mb-10 max-w-lg mx-auto animate-reveal delay-2">
             Available as a free download for Windows. No strings attached.
           </p>
           <div className="animate-reveal delay-3">

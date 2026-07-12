@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
                 className="w-8 h-auto opacity-70 group-hover:opacity-100 transition-opacity duration-300"
               />
             </Link>
-            <p className="text-sm text-slate-500 max-w-xs leading-relaxed">
+            <p className="text-sm text-slate-400 max-w-xs leading-relaxed">
               Professional audio tools crafted with precision.
             </p>
           </div>
@@ -44,7 +44,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-3">
               <li>
                 <button
-                  className="flex items-center text-slate-500 hover:text-white transition-colors duration-300 group text-sm"
+                  className="flex items-center text-slate-400 hover:text-white transition-colors duration-300 group text-sm"
                   onClick={() => handleNavigate('/download')}
                 >
                   <Download className="mr-2 h-3.5 w-3.5 group-hover:text-emerald-400 transition-colors duration-300" />
@@ -53,7 +53,7 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <button
-                  className="flex items-center text-slate-500 hover:text-white transition-colors duration-300 group text-sm"
+                  className="flex items-center text-slate-400 hover:text-white transition-colors duration-300 group text-sm"
                   onClick={() => window.open('/help', '_blank')}
                 >
                   <FileText className="mr-2 h-3.5 w-3.5 group-hover:text-emerald-400 transition-colors duration-300" />
@@ -79,7 +79,8 @@ const Footer: React.FC = () => {
                   key={label}
                   variant="outline"
                   size="icon"
-                  className="border-slate-800 text-slate-500 hover:bg-slate-800/60 hover:text-emerald-400 hover:border-slate-700 transition-all duration-300 h-9 w-9"
+                  aria-label={label}
+                  className="border-slate-800 text-slate-400 hover:bg-slate-800/60 hover:text-emerald-400 hover:border-slate-700 transition-all duration-300 h-11 w-11"
                   onClick={() => window.open(url, '_blank')}
                 >
                   <Icon className="h-3.5 w-3.5" />
@@ -91,20 +92,20 @@ const Footer: React.FC = () => {
 
         {/* Bottom bar */}
         <div className="border-t border-slate-800/50 pt-6 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-xs text-slate-600 mb-4 md:mb-0 tracking-wide">
+          <p className="text-xs text-slate-400 mb-4 md:mb-0 tracking-wide">
             © {currentYear} OpaqueSound. All rights reserved.
           </p>
 
           <div className="flex items-center space-x-4">
             <button
-              className="text-xs text-slate-600 hover:text-slate-400 transition-colors duration-300 flex items-center gap-1"
+              className="text-xs text-slate-400 hover:text-slate-200 transition-colors duration-300 flex items-center gap-1"
               onClick={() => window.open('/terms', '_blank')}
             >
               <FileText className="h-3 w-3" />
               Terms of Service
             </button>
             <button
-              className="text-xs text-slate-600 hover:text-slate-400 transition-colors duration-300 flex items-center gap-1"
+              className="text-xs text-slate-400 hover:text-slate-200 transition-colors duration-300 flex items-center gap-1"
               onClick={scrollToTop}
             >
               <ArrowUp className="h-3 w-3" />
