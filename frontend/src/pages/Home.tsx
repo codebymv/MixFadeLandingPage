@@ -10,10 +10,10 @@ const Home = () => {
   useEffect(() => {
     const run = () => setHeroReady(true);
     if (typeof window.requestIdleCallback === "function") {
-      const id = window.requestIdleCallback(run, { timeout: 2500 });
+      const id = window.requestIdleCallback(run, { timeout: 4000 });
       return () => window.cancelIdleCallback(id);
     }
-    const t = window.setTimeout(run, 1200);
+    const t = window.setTimeout(run, 2500);
     return () => window.clearTimeout(t);
   }, []);
 
