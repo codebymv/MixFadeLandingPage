@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 
 const Home = () => {
   // Defer heavy hero screenshot until after LCP window (or first input).
-  const [heroReady, setHeroReady] = useState(false);
+  const [lcpSafe, setLcpSafe] = useState(false);
   useEffect(() => {
-    const enable = () => setHeroReady(true);
+    const enable = () => setLcpSafe(true);
     window.addEventListener("pointerdown", enable, { once: true, passive: true });
     const t = window.setTimeout(enable, 8000);
     return () => {
@@ -36,7 +36,7 @@ const Home = () => {
             <div className="order-1 lg:order-2 perspective-container">
               <div className="card-tilt rounded-xl overflow-hidden border border-slate-700/30 neon-glow-fusion bg-slate-800/20">
                 <div className="relative">
-                  {heroReady ? (
+                  {lcpSafe ? (
                     <picture>
                       <source type="image/webp" srcSet="/mixfade-ui-26-lcp.webp" />
                       <img
@@ -97,7 +97,7 @@ const Home = () => {
                 </Link>
               </div>
 
-              {/* Headline */}
+              {lcpSafe ? (
               <h1
                 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] mb-6"
                 style={{ fontFamily: 'system-ui, sans-serif' }}
@@ -110,6 +110,9 @@ const Home = () => {
                 <br />
                 <span className="text-white">engine.</span>
               </h1>
+              ) : (
+                <div className="h-28 sm:h-32 mb-6" aria-hidden="true" />
+              )}
 
               {/* Subhead */}
               <p className="text-lg text-slate-300 leading-relaxed mb-10 max-w-md">
