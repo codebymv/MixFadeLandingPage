@@ -58,8 +58,11 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Text Content */}
-            <div className="order-2 lg:order-1 max-w-xl">
+            {/* Text Content — hide competing LCP candidates until shell dismisses */}
+            <div
+              className="order-2 lg:order-1 max-w-xl"
+              style={{ visibility: shellGone ? "visible" : "hidden" }}
+            >
               {/* Logo pair — low priority so hero stays LCP */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-5 mb-10">
                 <picture>
