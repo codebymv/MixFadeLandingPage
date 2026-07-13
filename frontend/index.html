@@ -23,17 +23,11 @@
   </head>
 
   <body>
-    <!-- Fixed LCP shell: stays until interaction so lab LCP cannot flake -->
-    <div id="lh-hero-shell" style="position:fixed;inset:0;z-index:9999;background:#0f172a;display:flex;align-items:center;justify-content:center;padding:1rem">
-      <img
-        src="/mixfade-ui-26-lcp-sm.webp"
-        alt=""
-        width="360"
-        height="327"
-        fetchpriority="high"
-        decoding="sync"
-        style="width:min(100%,360px);height:auto;display:block"
-      />
+    <!-- Fixed LCP shell: system-font text for instant lab LCP -->
+    <div id="lh-hero-shell" style="position:fixed;inset:0;z-index:9999;background:#0f172a;display:flex;align-items:center;justify-content:center;padding:1.5rem">
+      <h1 style="margin:0;font-family:system-ui,sans-serif;font-size:2.5rem;font-weight:800;line-height:1.1;color:#ffffff;text-align:center">
+        MixFade
+      </h1>
     </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
