@@ -98,6 +98,7 @@ const Home = () => {
               </div>
 
               {lcpSafe ? (
+              <>
               <h1
                 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] mb-6"
                 style={{ fontFamily: 'system-ui, sans-serif' }}
@@ -110,15 +111,16 @@ const Home = () => {
                 <br />
                 <span className="text-white">engine.</span>
               </h1>
-              ) : (
-                <div className="h-28 sm:h-32 mb-6" aria-hidden="true" />
-              )}
 
               {/* Subhead */}
               <p className="text-lg text-slate-300 leading-relaxed mb-10 max-w-md">
                 Seamlessly A/B your audio sources with references. Built for
                 producers, engineers, and anyone who cares about sound.
               </p>
+              </>
+              ) : (
+                <div className="h-48 mb-10" aria-hidden="true" />
+              )}
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-6">
