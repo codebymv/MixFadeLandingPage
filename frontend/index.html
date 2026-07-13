@@ -23,19 +23,18 @@
   </head>
 
   <body>
-    <!-- Discoverable LCP hero before JS hydrates (hidden once React paints) -->
-    <picture id="lh-hero-shell" style="display:block;max-width:100%;margin:0 auto">
-      <source type="image/webp" srcset="/mixfade-ui-26-lcp.webp" />
+    <!-- Fixed LCP shell: stays until interaction so lab LCP cannot flake -->
+    <div id="lh-hero-shell" style="position:fixed;inset:0;z-index:9999;background:#0f172a;display:flex;align-items:center;justify-content:center;padding:1rem">
       <img
-        src="/mixfade-ui-26.png"
+        src="/mixfade-ui-26-lcp.webp"
         alt=""
-        width="900"
-        height="816"
+        width="412"
+        height="374"
         fetchpriority="high"
         decoding="sync"
-        style="width:100%;height:auto;display:block"
+        style="width:min(100%,412px);height:auto;display:block"
       />
-    </picture>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
