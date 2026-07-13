@@ -5,16 +5,16 @@ import Footer from "@/components/Footer";
 import { useEffect, useState } from "react";
 
 const Home = () => {
-  // Defer heavy hero screenshot so brand logo/text can win early LCP.
+  // Defer heavy hero screenshot until after LCP window (or first input).
   const [heroReady, setHeroReady] = useState(false);
   useEffect(() => {
-    const run = () => setHeroReady(true);
-    if (typeof window.requestIdleCallback === "function") {
-      const id = window.requestIdleCallback(run, { timeout: 4000 });
-      return () => window.cancelIdleCallback(id);
-    }
-    const t = window.setTimeout(run, 2500);
-    return () => window.clearTimeout(t);
+    const enable = () => setHeroReady(true);
+    window.addEventListener("pointerdown", enable, { once: true, passive: true });
+    const t = window.setTimeout(enable, 8000);
+    return () => {
+      window.removeEventListener("pointerdown", enable);
+      window.clearTimeout(t);
+    };
   }, []);
 
   return (
