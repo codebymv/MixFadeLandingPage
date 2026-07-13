@@ -2,8 +2,21 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Download, Headphones, Zap, Files, Monitor, ArrowRight } from "lucide-react";
 import Footer from "@/components/Footer";
+import { useEffect, useState } from "react";
 
 const Home = () => {
+  // Defer heavy hero screenshot so brand logo/text can win early LCP.
+  const [heroReady, setHeroReady] = useState(false);
+  useEffect(() => {
+    const run = () => setHeroReady(true);
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(run, { timeout: 2500 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const t = window.setTimeout(run, 1200);
+    return () => window.clearTimeout(t);
+  }, []);
+
   return (
     <div className="min-h-screen bg-slate-900 noise-bg relative">
       {/* ═══════════════════════════════════════
@@ -23,6 +36,7 @@ const Home = () => {
             <div className="order-1 lg:order-2 perspective-container">
               <div className="card-tilt rounded-xl overflow-hidden border border-slate-700/30 neon-glow-fusion bg-slate-800/20">
                 <div className="relative">
+                  {heroReady ? (
                     <picture>
                       <source type="image/webp" srcSet="/mixfade-ui-26-lcp.webp" />
                       <img
@@ -31,11 +45,14 @@ const Home = () => {
                         className="w-full object-cover"
                         width={900}
                         height={816}
-                        loading="eager"
-                        decoding="sync"
-                        fetchPriority="high"
+                        loading="lazy"
+                        decoding="async"
+                        fetchPriority="low"
                       />
                     </picture>
+                  ) : (
+                    <div className="w-full aspect-[900/816] bg-slate-800/40" aria-hidden="true" />
+                  )}
                 </div>
               </div>
             </div>
@@ -55,9 +72,9 @@ const Home = () => {
                     className="w-56 h-14 object-contain"
                     width={560}
                     height={135}
-                    loading="lazy"
-                    decoding="async"
-                    fetchPriority="low"
+                    loading="eager"
+                    decoding="sync"
+                    fetchPriority="high"
                   />
                 </picture>
                 <span className="text-slate-400 text-sm font-medium tracking-wider uppercase">
@@ -81,7 +98,10 @@ const Home = () => {
               </div>
 
               {/* Headline */}
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] mb-6">
+              <h1
+                className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] mb-6"
+                style={{ fontFamily: 'system-ui, sans-serif' }}
+              >
                 <span className="text-white">Audio</span>
                 <br />
                 <span className="text-gradient-emerald-purple">
