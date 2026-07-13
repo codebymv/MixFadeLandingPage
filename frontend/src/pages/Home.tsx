@@ -2,8 +2,22 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Download, Headphones, Zap, Files, Monitor, ArrowRight } from "lucide-react";
 import Footer from "@/components/Footer";
+import { useEffect, useState } from "react";
 
 const Home = () => {
+  const [shellGone, setShellGone] = useState(
+    () => typeof document === "undefined" || !document.getElementById("lh-hero-shell"),
+  );
+  useEffect(() => {
+    if (shellGone) return;
+    const tick = () => {
+      if (!document.getElementById("lh-hero-shell")) setShellGone(true);
+    };
+    tick();
+    const id = window.setInterval(tick, 250);
+    return () => window.clearInterval(id);
+  }, [shellGone]);
+
   return (
     <div className="min-h-screen bg-slate-900 noise-bg relative">
       {/* ═══════════════════════════════════════
@@ -23,19 +37,23 @@ const Home = () => {
             <div className="order-1 lg:order-2 perspective-container">
               <div className="card-tilt rounded-xl overflow-hidden border border-slate-700/30 neon-glow-fusion bg-slate-800/20">
                 <div className="relative">
-                  <picture>
-                    <source type="image/webp" srcSet="/mixfade-ui-26-lcp.webp" />
-                    <img
-                      src="/mixfade-ui-26.png"
-                      alt="MixFade Complete Interface"
-                      className="w-full object-cover"
-                      width={900}
-                      height={816}
-                      loading="eager"
-                      decoding="sync"
-                      fetchPriority="high"
-                    />
-                  </picture>
+                  {shellGone ? (
+                    <picture>
+                      <source type="image/webp" srcSet="/mixfade-ui-26-lcp.webp" />
+                      <img
+                        src="/mixfade-ui-26.png"
+                        alt="MixFade Complete Interface"
+                        className="w-full object-cover"
+                        width={900}
+                        height={816}
+                        loading="eager"
+                        decoding="sync"
+                        fetchPriority="high"
+                      />
+                    </picture>
+                  ) : (
+                    <div className="w-full aspect-[900/816] bg-slate-800/40" aria-hidden="true" />
+                  )}
                 </div>
               </div>
             </div>
