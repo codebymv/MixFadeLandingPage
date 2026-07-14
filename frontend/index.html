@@ -22,8 +22,8 @@
   </head>
 
   <body>
-    <!-- Brand logo LCP shell — removed on hydrate -->
-    <div id="lh-hero-shell" style="position:fixed;inset:0;z-index:9999;background:#0f172a;display:flex;align-items:center;justify-content:center;padding:1.5rem">
+    <!-- Real hero bootstrap for LCP — cleared on first React paint (not a blank logo splash). -->
+    <div id="lh-hero-shell" style="position:fixed;inset:0;z-index:9999;background:#0f172a;padding:5.5rem 1.5rem 2rem;overflow:auto;font-family:system-ui,sans-serif">
       <img
         src="/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.webp"
         alt="MixFade"
@@ -31,8 +31,14 @@
         height="135"
         fetchpriority="high"
         decoding="sync"
-        style="width:14rem;height:auto"
+        style="width:14rem;height:auto;margin-bottom:2rem"
       />
+      <h1 style="margin:0 0 1.25rem;font-size:clamp(2rem,8vw,3.5rem);line-height:1.05;font-weight:700;color:#fff;max-width:36rem">
+        Audio<br /><span style="color:#34d399">analysis &amp; playback</span><br />engine.
+      </h1>
+      <p style="margin:0;font-size:1.1rem;line-height:1.6;color:#cbd5e1;max-width:28rem">
+        Seamlessly A/B your audio sources with references. Built for producers, engineers, and anyone who cares about sound.
+      </p>
     </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
