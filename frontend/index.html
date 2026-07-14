@@ -11,35 +11,30 @@
     <meta property="og:description" content="Comparative audio analysis and A/B playback for producers and engineers." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://mixfade.com/" />
+    <!-- GleamAI/FlashCore: fonts off LCP path -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&display=swap" />
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&display=optional"
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    />
     <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&display=optional"
+        rel="stylesheet"
+      />
     </noscript>
+    <!-- Real brand mark preload (no covering shell). -->
     <link rel="preload" as="image" href="/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.webp" type="image/webp" fetchpriority="high" />
+    <style>
+      html,body{margin:0;background:#0f172a;color:#fff}
+      #lh-lcp-h1{font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+    </style>
   </head>
 
   <body>
-    <!-- Real hero bootstrap for LCP — cleared on first React paint (not a blank logo splash). -->
-    <div id="lh-hero-shell" style="position:fixed;inset:0;z-index:9999;background:#0f172a;padding:5.5rem 1.5rem 2rem;overflow:auto;font-family:system-ui,sans-serif">
-      <img
-        src="/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.webp"
-        alt="MixFade"
-        width="560"
-        height="135"
-        fetchpriority="high"
-        decoding="sync"
-        style="width:14rem;height:auto;margin-bottom:2rem"
-      />
-      <h1 style="margin:0 0 1.25rem;font-size:clamp(2rem,8vw,3.5rem);line-height:1.05;font-weight:700;color:#fff;max-width:36rem">
-        Audio<br /><span style="color:#34d399">analysis &amp; playback</span><br />engine.
-      </h1>
-      <p style="margin:0;font-size:1.1rem;line-height:1.6;color:#cbd5e1;max-width:28rem">
-        Seamlessly A/B your audio sources with references. Built for producers, engineers, and anyone who cares about sound.
-      </p>
-    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
