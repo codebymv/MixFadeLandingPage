@@ -21,27 +21,8 @@ const Home = () => {
 
         <div className="container mx-auto relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            <div className="order-1 lg:order-2 perspective-container">
-              <div className="card-tilt rounded-xl overflow-hidden border border-slate-700/30 neon-glow-fusion bg-slate-800/20">
-                <div className="relative">
-                  <picture>
-                    <source type="image/webp" srcSet="/mixfade-ui-26-lcp.webp" />
-                    <img
-                      src="/mixfade-ui-26.png"
-                      alt="MixFade Complete Interface"
-                      className="w-full object-cover"
-                      width={900}
-                      height={816}
-                      loading="eager"
-                      decoding="async"
-                      fetchPriority="low"
-                    />
-                  </picture>
-                </div>
-              </div>
-            </div>
-
-            <div className="order-2 lg:order-1 max-w-xl">
+            {/* Copy first in DOM so system-ui H1 owns mobile LCP (Gleam pattern). */}
+            <div className="max-w-xl">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-5 mb-10">
                 <picture>
                   <source
@@ -55,8 +36,8 @@ const Home = () => {
                     width={560}
                     height={135}
                     loading="eager"
-                    decoding="sync"
-                    fetchPriority="high"
+                    decoding="async"
+                    fetchPriority="low"
                   />
                 </picture>
                 <span className="text-slate-400 text-sm font-medium tracking-wider uppercase">
@@ -82,7 +63,12 @@ const Home = () => {
               <h1
                 id="lh-lcp-h1"
                 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] mb-6"
-                style={{ fontFamily: "system-ui, -apple-system, Segoe UI, sans-serif" }}
+                style={{
+                  fontFamily: "system-ui, -apple-system, Segoe UI, sans-serif",
+                  fontSize: "clamp(2.25rem, 8vw, 3.75rem)",
+                  fontWeight: 700,
+                  lineHeight: 1.05,
+                }}
               >
                 <span className="text-white">Audio</span>
                 <br />
@@ -118,6 +104,27 @@ const Home = () => {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
+              </div>
+            </div>
+
+            {/* Desktop-only UI shot - hidden on mobile so it cannot steal LCP. */}
+            <div className="hidden lg:block perspective-container">
+              <div className="card-tilt rounded-xl overflow-hidden border border-slate-700/30 neon-glow-fusion bg-slate-800/20">
+                <div className="relative">
+                  <picture>
+                    <source type="image/webp" srcSet="/mixfade-ui-26-lcp.webp" />
+                    <img
+                      src="/mixfade-ui-26.png"
+                      alt="MixFade Complete Interface"
+                      className="w-full object-cover"
+                      width={900}
+                      height={816}
+                      loading="lazy"
+                      decoding="async"
+                      fetchPriority="low"
+                    />
+                  </picture>
+                </div>
               </div>
             </div>
           </div>

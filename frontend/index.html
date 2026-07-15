@@ -6,12 +6,13 @@
     <title>MixFade - The Ultimate Reference Tool</title>
     <meta name="description" content="MixFade is a comparative audio analysis and A/B playback engine for producers and engineers. Download free for desktop." />
     <link rel="canonical" href="https://mixfade.com/" />
-    <link rel="icon" href="/lovable-uploads/a6dcb986-37f8-47dc-b994-bf04e1a6a0bc.png" />
+    <!-- Tiny webp icon (not the ~190KB PNG). -->
+    <link rel="icon" type="image/webp" href="/lovable-uploads/nav-icon-64.webp" />
     <meta property="og:title" content="MixFade - The Ultimate Reference Tool" />
     <meta property="og:description" content="Comparative audio analysis and A/B playback for producers and engineers." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://mixfade.com/" />
-    <!-- GleamAI/FlashCore: fonts off LCP path -->
+    <!-- Fonts off LCP path (optional, non-blocking). -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -26,11 +27,21 @@
         rel="stylesheet"
       />
     </noscript>
-    <!-- Real brand mark preload (no covering shell). -->
-    <link rel="preload" as="image" href="/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.webp" type="image/webp" fetchpriority="high" />
+    <!--
+      No image preloads: mobile LCP is system-ui H1 (Gleam/SampleSeeker).
+      Hero UI shot is desktop-only.
+    -->
     <style>
       html,body{margin:0;background:#0f172a;color:#fff}
-      #lh-lcp-h1{font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+      #lh-lcp-h1{
+        font-family:system-ui,-apple-system,Segoe UI,sans-serif;
+        font-size:clamp(2.25rem,8vw,3.75rem);
+        font-weight:700;
+        line-height:1.05;
+        letter-spacing:-0.02em;
+        color:#fff;
+        margin:0 0 1.5rem;
+      }
     </style>
   </head>
 

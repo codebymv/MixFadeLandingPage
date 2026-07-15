@@ -1,8 +1,5 @@
 import { lazy, Suspense } from "react";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "next-themes";
 import Navigation from "./components/Navigation";
 import { DeferredToaster } from "./components/DeferredToaster";
 import Home from "./pages/Home";
@@ -12,34 +9,23 @@ const DownloadPage = lazy(() => import("./pages/Download"));
 const BugReport = lazy(() => import("./pages/BugReport"));
 const DocsPage = lazy(() => import("./pages/DocsPage"));
 
-const queryClient = new QueryClient();
-
+/** Landing boot: no QueryClient/ThemeProvider/TooltipProvider (unused on Home). */
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider 
-      attribute="class" 
-      defaultTheme="system" 
-      enableSystem 
-      disableTransitionOnChange
-    >
-      <TooltipProvider>
-        <DeferredToaster />
-        <BrowserRouter>
-          <Navigation />
-          <Suspense fallback={null}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/download" element={<DownloadPage />} />
-              <Route path="/bug-report" element={<BugReport />} />
-              <Route path="/help/*" element={<DocsPage />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+  <>
+    <DeferredToaster />
+    <BrowserRouter>
+      <Navigation />
+      <Suspense fallback={null}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/download" element={<DownloadPage />} />
+          <Route path="/bug-report" element={<BugReport />} />
+          <Route path="/help/*" element={<DocsPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  </>
 );
 
 export default App;
