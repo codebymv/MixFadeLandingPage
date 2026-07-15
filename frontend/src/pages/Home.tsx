@@ -33,9 +33,9 @@ const Home = () => {
                     src="/lovable-uploads/bda6aa94-5aa8-4405-a6f9-86145e9c48bc.png"
                     alt="MixFade Logo"
                     className="w-56 h-14 object-contain"
-                    width={560}
-                    height={135}
-                    loading="eager"
+                    width={224}
+                    height={56}
+                    loading="lazy"
                     decoding="async"
                   />
                 </picture>
@@ -49,8 +49,8 @@ const Home = () => {
                       src="/OS_Full_Logo_transparent.png"
                       alt="OpaqueSound Logo"
                       className="w-44 h-11 object-contain opacity-80 hover:opacity-100 transition-opacity duration-300"
-                      width={400}
-                      height={101}
+                      width={176}
+                      height={44}
                       loading="lazy"
                       decoding="async"
                     />
@@ -139,7 +139,7 @@ const Home = () => {
         {/* FEATURES */}
         <section className="py-24 px-6 section-glow relative">
           <div className="container mx-auto">
-            <div className="text-center mb-20 animate-reveal">
+            <div className="text-center mb-20">
               <p className="text-emerald-400 text-sm font-medium tracking-widest uppercase mb-4">
                 Features
               </p>
@@ -151,7 +151,7 @@ const Home = () => {
             </div>
 
             <div className="space-y-20 lg:space-y-28">
-              <div className="feature-row animate-reveal delay-1">
+              <div className="feature-row">
                 <div className="image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-green bg-slate-800/20">
                   <picture>
                     <source type="image/webp" srcSet="/mixfade-deck-26.webp" />
@@ -181,7 +181,7 @@ const Home = () => {
                 </div>
               </div>
 
-              <div className="feature-row reversed animate-reveal delay-2">
+              <div className="feature-row reversed">
                 <div className="flex justify-center w-full">
                   <div className="image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-fusion bg-slate-800/50">
                     <picture>
@@ -213,7 +213,7 @@ const Home = () => {
                 </div>
               </div>
 
-              <div className="feature-row animate-reveal delay-3">
+              <div className="feature-row">
                 <div className="flex justify-center w-full">
                   <div className="image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-green bg-slate-800/50">
                     <picture>
@@ -245,7 +245,7 @@ const Home = () => {
                 </div>
               </div>
 
-              <div className="feature-row reversed animate-reveal delay-4">
+              <div className="feature-row reversed">
                 <div className="image-reveal rounded-xl overflow-hidden border border-slate-700/30 neon-glow-purple bg-slate-800/20">
                   <picture>
                     <source type="image/webp" srcSet="/mixfade-visualizer-26.webp" />
@@ -287,18 +287,18 @@ const Home = () => {
           </div>
 
           <div className="container mx-auto text-center relative z-10">
-            <p className="text-emerald-400 text-sm font-medium tracking-widest uppercase mb-4 animate-reveal">
+            <p className="text-emerald-400 text-sm font-medium tracking-widest uppercase mb-4">
               Get Started
             </p>
-            <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 animate-reveal delay-1">
+            <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
               <span className="text-gradient-emerald-purple">
                 Check it out free.
               </span>
             </h2>
-            <p className="text-xl text-slate-300 mb-10 max-w-lg mx-auto animate-reveal delay-2">
+            <p className="text-xl text-slate-300 mb-10 max-w-lg mx-auto">
               Available as a free download for Windows. No strings attached.
             </p>
-            <div className="animate-reveal delay-3">
+            <div>
               <Link to="/download">
                 <Button
                   size="lg"

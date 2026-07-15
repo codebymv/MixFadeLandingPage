@@ -33,6 +33,14 @@
     -->
     <style>
       html,body{margin:0;background:#0f172a;color:#fff}
+      /* Reserve first-viewport layout before full CSS (blocking stylesheet + prerender). */
+      #root nav{position:fixed;top:0;left:0;right:0;z-index:50;height:72px}
+      /* Hero: pt-28 pb-24 px-6 — keep content below fixed nav */
+      #root .min-h-screen{min-height:100vh;background:#0f172a}
+      #root .min-h-screen > section:first-of-type{
+        padding:7rem 1.5rem 6rem;
+        box-sizing:border-box;
+      }
       #lh-lcp-h1{
         font-family:system-ui,-apple-system,Segoe UI,sans-serif;
         font-size:clamp(2.25rem,8vw,3.75rem);

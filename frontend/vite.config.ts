@@ -26,9 +26,9 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
+    // Async CSS is OK when index.html critical CSS reserves nav/hero layout (avoids CLS).
     asyncCssPlugin(),
-    mode === 'development' &&
-    componentTagger(),
+    mode === "development" && componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
