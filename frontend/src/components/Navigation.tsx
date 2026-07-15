@@ -52,7 +52,6 @@ const Navigation = () => {
                 height={64}
                 loading="lazy"
                 decoding="async"
-                fetchPriority="low"
               />
             </picture>
           </Link>

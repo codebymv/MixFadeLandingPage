@@ -37,7 +37,6 @@ const Home = () => {
                     height={135}
                     loading="eager"
                     decoding="async"
-                    fetchPriority="low"
                   />
                 </picture>
                 <span className="text-slate-400 text-sm font-medium tracking-wider uppercase">
@@ -54,7 +53,6 @@ const Home = () => {
                       height={101}
                       loading="lazy"
                       decoding="async"
-                      fetchPriority="low"
                     />
                   </picture>
                 </Link>
@@ -121,7 +119,6 @@ const Home = () => {
                       height={816}
                       loading="lazy"
                       decoding="async"
-                      fetchPriority="low"
                     />
                   </picture>
                 </div>
@@ -256,8 +253,8 @@ const Home = () => {
                       src="/mixfade-visualizer-26.png"
                       alt="Real-time Unique Visuals"
                       className="w-full object-cover"
-                      width={1280}
-                      height={983}
+                      width={800}
+                      height={614}
                       loading="lazy"
                       decoding="async"
                     />
