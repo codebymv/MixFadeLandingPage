@@ -1,22 +1,7 @@
-import { defineConfig, type Plugin } from "vite";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
-
-function asyncCssPlugin(): Plugin {
-  return {
-    name: "async-css",
-    apply: "build",
-    transformIndexHtml(html) {
-      return html.replace(
-        /<link rel="stylesheet"([^>]*?)href="([^"]+\.css)"([^>]*?)>/g,
-        (_match, before, href, after) =>
-          `<link rel="preload" as="style" href="${href}"${before}${after} onload="this.onload=null;this.rel='stylesheet'">` +
-          `<noscript><link rel="stylesheet" href="${href}"></noscript>`,
-      );
-    },
-  };
-}
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -26,8 +11,9 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    // Async CSS is OK when index.html critical CSS reserves nav/hero layout (avoids CLS).
-    asyncCssPlugin(),
+    // CSS must stay render-blocking with prerendered HTML.
+    // Async CSS caused a visible snap (hero UI shot showing then hiding on mobile,
+    // grid stacking → 2-col, container padding jump) when Tailwind arrived late.
     mode === "development" && componentTagger(),
   ].filter(Boolean),
   resolve: {

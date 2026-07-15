@@ -28,18 +28,26 @@
       />
     </noscript>
     <!--
-      No image preloads: mobile LCP is system-ui H1 (Gleam/SampleSeeker).
-      Hero UI shot is desktop-only.
+      First-viewport layout insurance before the blocking main stylesheet.
+      Must match Tailwind so prerender → paint → hydrate has no snap.
     -->
     <style>
       html,body{margin:0;background:#0f172a;color:#fff}
-      /* Reserve first-viewport layout before full CSS (blocking stylesheet + prerender). */
-      #root nav{position:fixed;top:0;left:0;right:0;z-index:50;height:72px}
-      /* Hero: pt-28 pb-24 px-6 — keep content below fixed nav */
+      #root nav{position:fixed;top:0;left:0;right:0;z-index:50;min-height:4rem}
+      #root .container{width:100%;margin-left:auto;margin-right:auto;max-width:1400px;padding-left:2rem;padding-right:2rem;box-sizing:border-box}
       #root .min-h-screen{min-height:100vh;background:#0f172a}
-      #root .min-h-screen > section:first-of-type{
-        padding:7rem 1.5rem 6rem;
-        box-sizing:border-box;
+      #root .min-h-screen > section:first-of-type{padding:7rem 1.5rem 6rem;box-sizing:border-box}
+      /* Desktop-only hero UI — hide until lg so mobile never paints then unpaints it */
+      #root .perspective-container{display:none!important}
+      @media (min-width:1024px){
+        #root .perspective-container{display:block!important}
+        #root .min-h-screen > section:first-of-type .grid.lg\:grid-cols-2,
+        #root .min-h-screen > section:first-of-type .grid{
+          display:grid;
+          grid-template-columns:repeat(2,minmax(0,1fr));
+          gap:4rem;
+          align-items:center;
+        }
       }
       #lh-lcp-h1{
         font-family:system-ui,-apple-system,Segoe UI,sans-serif;
