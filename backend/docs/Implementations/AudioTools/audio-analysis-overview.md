@@ -5,12 +5,15 @@ MixFade provides professional-grade audio analysis tools built on the Web Audio 
 ## Core Analysis Components
 
 ### **🎛️ Level Meters**
-Real-time peak and RMS level monitoring with professional broadcast standards.
+Real-time peak, RMS, BS.1770 LUFS, and FIR true-peak monitoring with professional broadcast standards.
+
+Current implementation note: Desktop and plugin analysis default to ITU-R BS.1770 LUFS (`enableLufs: true`) and FIR true peak (`enableTruePeak: true`). Legacy `estimateLUFS` is only a fallback when standards fields are absent. Compare UI uses integrated-LUFS and true-peak deltas, not RMS-estimate `lufs`.
 
 #### **Features:**
 - **Peak Level Detection**: Instantaneous peak level measurement
-- **RMS Calculation**: Root Mean Square for perceived loudness
-- **True Peak Detection**: Inter-sample peak detection
+- **RMS Calculation**: Root Mean Square level display
+- **True Peak Detection**: FIR oversampled inter-sample peak (dBTP; defaults on)
+- **BS.1770 LUFS**: Momentary, short-term, and gated integrated loudness (defaults on)
 - **Headroom Indication**: Visual feedback for optimal recording levels
 - **Stereo Channel Separation**: Independent left/right channel monitoring
 
@@ -150,11 +153,11 @@ enum ColorMapType {
 Professional loudness measurement compliant with broadcast standards.
 
 #### **Measurements:**
-- **LUFS (LKFS)**: Loudness Units relative to Full Scale
-- **LU Range**: Loudness range measurement
-- **Peak Levels**: True peak and sample peak detection
-- **Integrated Loudness**: Long-term loudness assessment
-- **Short-term Loudness**: 3-second sliding window measurement
+- **Momentary / Short-term / Integrated LUFS**: BS.1770 K-weighted loudness (defaults on)
+- **True Peak (dBTP)**: FIR oversampled inter-sample peak (defaults on)
+- **Compare deltas**: Integrated-LUFS and true-peak deltas between decks/sources
+- **Fallback**: `estimateLUFS` RMS approximation only when standards fields are absent
+- **Sample Peak**: Instantaneous sample peak alongside true peak
 
 #### **Standards Support:**
 ```typescript

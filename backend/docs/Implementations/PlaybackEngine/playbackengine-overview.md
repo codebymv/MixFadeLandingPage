@@ -216,7 +216,7 @@ The PlaybackEngine provides comprehensive real-time audio analysis:
 - **Peak Levels**: Instant peak detection
 - **RMS Levels**: Power-averaged levels
 - **LUFS Monitoring**: Broadcast-standard loudness
-- **True Peak**: Oversampled peak detection
+- **LUFS / True Peak**: BS.1770 LUFS + FIR dBTP (defaults on); `estimateLUFS` only if standards fields are absent
 
 #### Stereo Analysis
 - **Phase Correlation**: Stereo compatibility measurement

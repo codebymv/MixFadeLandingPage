@@ -62,12 +62,13 @@ MixFade implements a modular audio analysis system with four primary visualizati
 - **Purpose**: Broadcast-quality dual-channel level monitoring
 - **Features**:
   - Independent L/R channel meters with peak hold
-  - Sample peak and true peak detection (up to +6dBFS)
+  - Sample peak and FIR true peak (dBTP; defaults on)
   - RMS averaging with 300ms time window
-  - LUFS loudness monitoring (EBU R 128 / ITU-R BS.1770)
+  - BS.1770 momentary / short-term / integrated LUFS (defaults on)
+  - `estimateLUFS` only as fallback when standards fields are absent
   - Professional color-coded level zones
   - 8dB/second peak decay rate
-- **Standards**: EBU R 128, ITU-R BS.1770, AES17 compliance
+- **Standards**: ITU-R BS.1770 LUFS + FIR true peak enabled by default; compare uses integrated-LUFS / true-peak deltas
 - **Performance**: Real-time display with 50ms smoothing updates
 
 [📖 Detailed Documentation →](./LevelMeters/component-overview.md)
@@ -192,7 +193,7 @@ rightAnalyser.getFloatTimeDomainData(rightSamples); // For stereo analysis
 ### **Level Monitoring**
 - **Peak Detection**: Sample and inter-sample (true peak)
 - **RMS Integration**: 300ms time window with 50ms updates
-- **LUFS Measurement**: Full EBU R 128 / ITU-R BS.1770 compliance
+- **LUFS Measurement**: BS.1770 momentary / short-term / integrated (defaults on); `estimateLUFS` fallback-only
 - **Dynamic Range**: -60dB to +6dB measurement capability
 
 ### **Stereo Analysis**

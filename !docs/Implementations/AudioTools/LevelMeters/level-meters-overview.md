@@ -4,11 +4,13 @@ The LevelMeter is a professional-grade dual-channel audio level meter that provi
 
 ## Overview
 
-The LevelMeter component renders stereo audio level meters with separate left and right channel visualization, featuring peak hold indicators, true peak detection, RMS averaging, and LUFS loudness monitoring for professional audio applications.
+The LevelMeter component renders stereo audio level meters with separate left and right channel visualization, featuring peak hold indicators, FIR true peak detection, RMS averaging, and BS.1770 LUFS loudness monitoring for professional audio applications.
+
+Current implementation note: Defaults are `enableLufs` + `enableTruePeak`. Adapters prefer `lufsIntegrated` / `lufsMomentary` / `lufsShortTerm` / `truePeakDbtp`; `estimateLUFS` is fallback-only. UI labels TP when dBTP is present, otherwise Est. PK.
 
 ### **Key Features**
 - **Dual Channel Monitoring**: Independent left and right channel level meters
-- **Professional Standards**: EBU R 128, ITU-R BS.1770, AES17 compliance
+- **Professional Standards**: EBU R 128 / ITU-R BS.1770 LUFS + FIR true peak (defaults on)
 - **Multiple Measurement Types**: Peak, RMS, LUFS, True Peak detection
 - **Peak Hold Indicators**: Visual peak hold with decay
 - **Real-time Smoothing**: Configurable RMS averaging for stable readings
@@ -216,10 +218,12 @@ if (audioLevels.left > leftPeak) {
   setLeftPeak(audioLevels.left);
 }
 
-// Simulate true peak (slightly higher than sample peak)
-const leftTP = Math.min(1.5, audioLevels.left * 1.08); // Can exceed 0dBFS
-if (leftTP > leftTruePeak) {
-  setLeftTruePeak(leftTP);
+// Prefer FIR dBTP; fall back to sample-peak-derived hold only when absent
+const truePeakLinear = typeof audioLevels.truePeakDbtp === 'number'
+  ? dbtpToLinear(audioLevels.truePeakDbtp)
+  : Math.min(1.5, audioLevels.left * 1.08);
+if (truePeakLinear > leftTruePeak) {
+  setLeftTruePeak(truePeakLinear);
 }
 ```
 
