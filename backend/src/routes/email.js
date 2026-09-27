@@ -79,20 +79,29 @@ router.post('/collect', async (req, res) => {
       ip: req.ip || req.connection.remoteAddress
     };
 
-    console.log('📧 Email collected for mailing list:', SecurityUtils.sanitizeLogData(emailLogEntry));
+    // A Shopify failure still lets the download through, so say plainly whether the email was kept.
+    const savedToMailingList = ['created', 'updated', 'exists'].includes(mailingListResult.action);
+    if (savedToMailingList) {
+      console.log('📧 Email collected for mailing list:', SecurityUtils.sanitizeLogData(emailLogEntry));
+    } else {
+      console.error('⚠️ Email NOT saved to mailing list:', SecurityUtils.sanitizeLogData(emailLogEntry));
+    }
 
     // Return success response
-    const responseMessage = mailingListResult.action === 'created' 
+    const responseMessage = mailingListResult.action === 'created'
       ? 'Welcome! You\'ve been added to our mailing list. Your download is ready!'
       : mailingListResult.action === 'updated'
       ? 'Welcome back! You\'re now subscribed to updates. Your download is ready!'
-      : 'Welcome back! Your download is ready.';
+      : mailingListResult.action === 'exists'
+      ? 'Welcome back! Your download is ready.'
+      : 'Your download is ready.';
 
     res.status(200).json({
       success: true,
       sessionId,
       message: responseMessage,
       customer: {
+        saved: savedToMailingList,
         exists: mailingListResult.action === 'exists',
         added: mailingListResult.action === 'created',
         subscribed: mailingListResult.nowSubscribed

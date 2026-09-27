@@ -14,7 +14,8 @@ const isMobileDevice = () => {
     'blackberry', 'webos', 'opera mini', 'windows phone'
   ];
   const isMobileUA = mobileKeywords.some(keyword => userAgent.includes(keyword));
-  const isSmallScreen = window.innerWidth <= 768 || window.innerHeight <= 1024;
+  // Width only: a height test flagged every touchscreen Windows laptop as mobile.
+  const isSmallScreen = window.innerWidth <= 768;
   const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   return isMobileUA || (isSmallScreen && isTouchDevice);
 };

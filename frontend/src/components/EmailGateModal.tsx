@@ -172,10 +172,6 @@ const EmailGateModal = ({
                   <span className="text-emerald-500/60">›</span>
                   <span>Updates & new features</span>
                 </li>
-                <li className="flex items-center space-x-2">
-                  <span className="text-emerald-500/60">›</span>
-                  <span>Exclusive sample packs and MIDIs</span>
-                </li>
               </ul>
             </div>
 
