@@ -32,7 +32,7 @@ const loadTsModule = (...segments) => {
 test('public app routes stay wired to the expected landing pages', () => {
   const appSource = readSource('App.tsx');
 
-  assert.match(appSource, /<BrowserRouter>/);
+  assert.match(readSource('main.tsx'), /<BrowserRouter>/);
   assert.match(appSource, /<Navigation \/>/);
 
   const routes = [...appSource.matchAll(/<Route\s+path="([^"]+)"\s+element={<([A-Za-z]+)\s*\/>}\s*\/>/g)]
@@ -50,8 +50,8 @@ test('public app routes stay wired to the expected landing pages', () => {
 test('home page keeps primary download calls to action wired', () => {
   const homeSource = readSource('pages', 'Home.tsx');
 
-  assert.match(homeSource, /<Link to="\/download">/);
-  assert.match(homeSource, /<Link to="\/download\?tab=features">/);
+  assert.match(homeSource, /<Link to="\/download"[\s>]/);
+  assert.match(homeSource, /<Link to="\/download\?tab=features"[\s>]/);
   assert.match(homeSource, /Available as a free download for Windows/);
 });
 
