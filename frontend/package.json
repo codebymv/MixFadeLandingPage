@@ -12,12 +12,7 @@
     "build:dev": "vite build --mode development && node scripts/prerender.mjs",
     "prerender": "node scripts/prerender.mjs",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "setup:s3": "node scripts/setup-s3.js",
-    "deploy:release": "node scripts/deploy-releases.js",
-    "deploy:dry-run": "node scripts/deploy-releases.js --dry-run",
-    "create:installer": "node scripts/create-installer.js",
-    "upload:manual": "node scripts/manual-upload.js"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@formspree/react": "^3.0.0",
